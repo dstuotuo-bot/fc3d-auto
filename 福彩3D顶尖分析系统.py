@@ -832,51 +832,51 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
                     <div><span class="badge-primary">🎯 和值精确</span> +5分</div>
                     <div><span class="badge-primary">📊 和值接近</span> +2分</div>
-                    <div><span class="badge-primary">✨ 奇偶匹配</span> +4分</div>
-                    <div><span class="badge-primary">📏 大小匹配</span> +4分</div>
-                    <div><span class="badge-primary">🔮 形态匹配</span> +3分</div>
-                    <div><span class="badge-primary">📍 位置合理性</span> +3分</div>
-                    <div><span class="badge-primary">🛡️ 防重奖励</span> +1分</div>
-                </div>
-            </div>
-        </div>
+                    <div><span class="badge-primary">✨ 奇偶匹配</span> +4分</div><div><span class="badge-primary">✨ 奇偶匹配</span>+4分</div>
+                    <div><span class="badge-primary">📏 大小匹配</span> +4分</div><div><span class="badge-primary">📏 大小匹配</span>+4分</div>
+                    <div><span class="badge-primary">🔮 形态匹配</span> +3分</div><div><span class="badge-primary">🔮 形态匹配</span>+3分</div><div><span class="badge-primary">🔮 形态匹配</span>+3分</div><div><span class="badge-primary">🔮 形态匹配</span>+3分</div>
+                    <div><span class="badge-primary">📍 位置合理性</span> +3分</div><div><span class="badge-primary">📍 位置合理性</span>+3分</div><div><span class="badge-primary">📍 位置合理性</span>+3分</div><div><span class="badge-primary">📍 位置合理性</span>+3分</div>
+                    <div><span class="badge-primary">🛡️ 防重奖励</span> +1分</div><div><span class="badge-primary">🛡️ 防重奖励</span>+1分</div><div><span class="badge-primary">🛡️ 防重奖励</span>+1分</div><div><span class="badge-primary">🛡️ 防重奖励</span>+1分</div>
+                </div></div></div></div>
+            </div></div></div></div>
+        </div></div></div></div>
         
-        <div class="footer">
-            ⚠️ 本分析基于历史数据统计规律，仅供学习参考<br>
-            彩票开奖是独立随机事件，任何号码中奖概率相同
-        </div>
-    </div>
-</body>
-</html>
-'''
+        <div class="footer"><div class="footer"><div class="footer"><div class="footer">
+            ⚠️ 本分析基于历史数据统计规律，仅供学习参考<br>⚠️ 本分析基于历史数据统计规律，仅供学习参考<br>⚠️ 本分析基于历史数据统计规律，仅供学习参考⚠️ 本分析基于历史数据统计规律，仅供学习参考<br>
+            彩票开奖是独立随机事件，任何号码中奖概率相同彩票开奖是独立随机事件，任何号码中奖概率相同彩票开奖是独立随机事件，任何号码中奖概率相同彩票开奖是独立随机事件，任何号码中奖概率相同
+        </div></div></div></div>
+    </div></div></div></div>
+</body></body></body></body>
+</html></html></html></html>
+''''''''''''
     
-    filename = "fc3d_report.html"
-    with open(filename, 'w', encoding='utf-8') as f:
-        f.write(html)
+    filename = "fc3d_report.html"文件名 ="fc3d_report.html"
+    with open(filename, 'w', encoding='utf-8') as f:    和 打开(文件名，'在'，编码='utf-8') 作为f：
+        f.write(html)f.写(html)
     
-    return filename
+    return filename    返回文件名
 
 
 # ============================================================================
-# 主程序
+# 主程序# 主程序# 主程序# 主程序
 # ============================================================================
-def main():
-    df = load_data()
-    if df is None:
-        print("数据加载失败")
-        return
+def main():定义 主要的():
+    df = load_data()df =加载数据()
+    if df is None:    如果df是 没有任何:
+        print("数据加载失败")        打印("数据加载失败")print("数据加载失败") 打印("数据加载失败")
+        return返回return返回
     
-    latest = df.iloc[-1]['期号']
-    next_period = int(latest) + 1
-    print(f"\n最新期号: {latest} | 下一期: {next_period}")
+    latest = df.iloc[-1]['期号']latest = df.iloc[-1]['期号']
+    next_period = int(latest) + 1下一个周期 =整数(最新的) + 1
+    print(f"\n最新期号: {latest} | 下一期: {next_period}")print(f"\n最新期号: {latest} | 下一期: {next_period}")
     
-    df_recent = df.tail(100)
-    print(f"分析基数: 最近{len(df_recent)}期")
+    df_recent = df.tail(100)df_recent = df。尾巴(100)
+    print(f"分析基数: 最近{len(df_recent)}期")print(f"分析基数: 最近{len(df_recent)}期")
     
-    predicted_pattern, pattern_cnt = analyze_pattern(df_recent)
-    print(f"预测形态: {predicted_pattern}")
+    predicted_pattern, pattern_cnt = analyze_pattern(df_recent)预测模式，模式计数 =分析模式(df_recent)
+    print(f"预测形态: {predicted_pattern}")print(f"预测形态: {predicted_pa​​ttern}")
     
-    pos_data = {}
+    pos_data = {}pos_data ={}
     analyze_positions(df_recent, pos_data)
     
     features = analyze_features(df_recent)
