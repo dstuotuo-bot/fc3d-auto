@@ -1,0 +1,33 @@
+name: 福彩3D自动分析
+
+on:
+  schedule:
+    - cron: '0 10 * * *'
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+    
+    - name: 设置Python环境
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: 安装依赖库
+      run: |
+        pip install pandas numpy matplotlib requests beautifulsoup4 openpyxl
+    
+    - name: 运行分析程序
+      run: python 福彩3D顶尖分析系统.py
+    
+    - name: 上传报告
+      uses: actions/upload-artifact@v4
+      with:
+        name: fc3d-report
+        path: fc3d_report.html
+        retention-days: 7
