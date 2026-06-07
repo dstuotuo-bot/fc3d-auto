@@ -726,24 +726,24 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
         
         <div class="glass-card">
             <div class="card-header"><span>🔄</span><h2>备选参考 · 形态匹配组合</h2></div>
-            <div class="card-body"><div class="card-body">
+            <div class="card-body">
                 <div style="display: flex; flex-wrap: wrap; gap: 16px;">
-''''''
+'''
     
     pattern_matched = [c for c in candidates if c['形态'] == predicted_pattern and c not in candidates[:5]]
     for c in pattern_matched[:12]:
         nums = list(c['号码'])
         html += f'''
-    <div style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 12px 18px; text-align: center;">
+                    <div style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 12px 18px; text-align: center;">
                         <div><span class="ball-small">{nums[0]}</span><span class="ball-small">{nums[1]}</span><span class="ball-small">{nums[2]}</span></div>
                         <div style="font-size: 12px; color: #94a3b8;">{c['得分']}分</div>
                     </div>
-''''''
+'''
     
     html += f'''
-                </div></div>
-            </div></div>
-        </div></div>
+                </div>
+            </div>
+        </div>
         
         <div class="glass-card">
             <div class="card-header"><span>📖</span><h2>评分系统 · 满分20分</h2></div>
