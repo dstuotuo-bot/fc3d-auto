@@ -1,5 +1,5 @@
 """
-福彩3D 顶尖专业级分析系统（GitHub Actions 云端版）
+福彩3D 顶尖专业级分析系统（GitHub Actions 云端优化版）
 功能：自动抓取 + 深度分析 + 5注推演 + HTML报告 + 历史准确率 + 走势图
 """
 
@@ -169,47 +169,45 @@ def calculate_accuracy(df):
 
 
 # ============================================================================
-# 走势图生成
+# 走势图生成（云端优化版）
 # ============================================================================
 def generate_charts(df):
-    """生成走势图"""
+    """生成走势图 - 云端优化版"""
     print("\n" + "=" * 80)
     print("【生成走势图】")
     print("=" * 80)
     
     charts = []
+    
+    if len(df) < 15:
+        print("  ⚠️ 数据不足15期，跳过走势图")
+        return charts
+    
     recent_15 = df.tail(15).copy()
     recent_15 = recent_15.reset_index(drop=True)
     
     # 图1：和值走势图
     try:
-        fig, ax = plt.subplots(figsize=(24, 12))
-        dates = [f"{row['开奖日期'].month}/{row['开奖日期'].day}" for _, row in recent_15.iterrows()]
+        plt.rcParams['font.sans-serif'] = ['DejaVu Sans']
+        fig, ax = plt.subplots(figsize=(16, 8))
+        dates = [str(i+1) for i in range(len(recent_15))]
         sums = recent_15['和值'].tolist()
-        periods = recent_15['期号'].tolist()
         
-        ax.plot(range(len(dates)), sums, 'r-o', linewidth=3, markersize=12, alpha=0.9, color='#e74c3c')
+        ax.plot(dates, sums, 'r-o', linewidth=2, markersize=8, color='#e74c3c')
         mean_sum = np.mean(sums)
-        ax.axhline(y=mean_sum, color='#3498db', linestyle='--', linewidth=2.5, label=f'均值: {mean_sum:.1f}')
-        ax.axhspan(9, 16, alpha=0.15, color='#2ecc71', label='常见区间 9-16')
+        ax.axhline(y=mean_sum, color='#3498db', linestyle='--', linewidth=2, label=f'Mean: {mean_sum:.1f}')
         
-        for i, (x, y) in enumerate(zip(range(len(dates)), sums)):
-            ax.annotate(str(y), (x, y), textcoords="offset points", xytext=(0, 20), ha='center', fontsize=14, fontweight='bold', color='#e74c3c')
+        for i, (x, y) in enumerate(zip(dates, sums)):
+            ax.annotate(str(y), (x, y), textcoords="offset points", xytext=(0, 10), ha='center', fontsize=10)
         
-        ax.set_title('福彩3D 和值走势图（最近15期）', fontsize=22, fontweight='bold')
-        ax.set_xlabel('期数（日期）', fontsize=16)
-        ax.set_ylabel('和值', fontsize=16)
-        ax.set_xticks(range(len(dates)))
-        ax.set_xticklabels([f"{periods[i]}\n{dates[i]}" for i in range(len(dates))], fontsize=12)
-        ax.set_ylim(0, 27)
-        ax.set_yticks(range(0, 28, 2))
-        ax.legend(loc='upper right', fontsize=14)
-        ax.grid(True, alpha=0.3, linestyle='--')
-        ax.set_facecolor('#fafafa')
-        fig.patch.set_facecolor('white')
+        ax.set_title('Sum Trend (Last 15 Periods)', fontsize=16)
+        ax.set_xlabel('Period', fontsize=12)
+        ax.set_ylabel('Sum', fontsize=12)
+        ax.legend()
+        ax.grid(True, alpha=0.3)
         
         plt.tight_layout()
-        plt.savefig('fc3d_sum_trend.png', dpi=200, bbox_inches='tight')
+        plt.savefig('fc3d_sum_trend.png', dpi=150, bbox_inches='tight')
         plt.close()
         charts.append('fc3d_sum_trend.png')
         print("  ✅ 和值走势图")
@@ -218,136 +216,57 @@ def generate_charts(df):
     
     # 图2：跨度走势图
     try:
-        fig, ax = plt.subplots(figsize=(24, 12))
-        dates = [f"{row['开奖日期'].month}/{row['开奖日期'].day}" for _, row in recent_15.iterrows()]
+        fig, ax = plt.subplots(figsize=(16, 8))
+        dates = [str(i+1) for i in range(len(recent_15))]
         spans = recent_15['跨度'].tolist()
-        periods = recent_15['期号'].tolist()
         
-        ax.plot(range(len(dates)), spans, 'g-s', linewidth=3, markersize=12, alpha=0.9, color='#27ae60')
+        ax.plot(dates, spans, 'g-s', linewidth=2, markersize=8, color='#27ae60')
         mean_span = np.mean(spans)
-        ax.axhline(y=mean_span, color='#e67e22', linestyle='--', linewidth=2.5, label=f'均值: {mean_span:.1f}')
+        ax.axhline(y=mean_span, color='#e67e22', linestyle='--', linewidth=2, label=f'Mean: {mean_span:.1f}')
         
-        for i, (x, y) in enumerate(zip(range(len(dates)), spans)):
-            ax.annotate(str(y), (x, y), textcoords="offset points", xytext=(0, 20), ha='center', fontsize=14, fontweight='bold', color='#27ae60')
+        for i, (x, y) in enumerate(zip(dates, spans)):
+            ax.annotate(str(y), (x, y), textcoords="offset points", xytext=(0, 10), ha='center', fontsize=10)
         
-        ax.set_title('福彩3D 跨度走势图（最近15期）', fontsize=22, fontweight='bold')
-        ax.set_xlabel('期数（日期）', fontsize=16)
-        ax.set_ylabel('跨度', fontsize=16)
-        ax.set_xticks(range(len(dates)))
-        ax.set_xticklabels([f"{periods[i]}\n{dates[i]}" for i in range(len(dates))], fontsize=12)
+        ax.set_title('Span Trend (Last 15 Periods)', fontsize=16)
+        ax.set_xlabel('Period', fontsize=12)
+        ax.set_ylabel('Span', fontsize=12)
         ax.set_ylim(-0.5, 9.5)
         ax.set_yticks(range(10))
-        ax.legend(loc='upper right', fontsize=14)
-        ax.grid(True, alpha=0.3, linestyle='--')
-        ax.set_facecolor('#fafafa')
-        fig.patch.set_facecolor('white')
+        ax.legend()
+        ax.grid(True, alpha=0.3)
         
         plt.tight_layout()
-        plt.savefig('fc3d_span_trend.png', dpi=200, bbox_inches='tight')
+        plt.savefig('fc3d_span_trend.png', dpi=150, bbox_inches='tight')
         plt.close()
         charts.append('fc3d_span_trend.png')
         print("  ✅ 跨度走势图")
     except Exception as e:
         print(f"  ⚠️ 跨度走势图失败: {e}")
     
-    # 图3：和值分布直方图
+    # 图3：各位置频率图
     try:
-        fig, ax = plt.subplots(figsize=(20, 10))
-        all_sums = df['和值'].tolist()
-        ax.hist(all_sums, bins=range(0, 28), edgecolor='white', alpha=0.8, color='#e74c3c', rwidth=0.9)
-        ax.axvline(x=np.mean(all_sums), color='#3498db', linestyle='--', linewidth=2.5, label=f'均值: {np.mean(all_sums):.1f}')
-        ax.set_title('福彩3D 和值分布直方图', fontsize=22, fontweight='bold')
-        ax.set_xlabel('和值', fontsize=16)
-        ax.set_ylabel('出现次数', fontsize=16)
-        ax.set_xticks(range(0, 28, 2))
-        ax.legend(fontsize=14)
-        ax.set_facecolor('#fafafa')
-        plt.tight_layout()
-        plt.savefig('fc3d_sum_hist.png', dpi=200, bbox_inches='tight')
-        plt.close()
-        charts.append('fc3d_sum_hist.png')
-        print("  ✅ 和值分布图")
-    except Exception as e:
-        print(f"  ⚠️ 和值分布图失败: {e}")
-    
-    # 图4：形态占比饼图
-    try:
-        fig, ax = plt.subplots(figsize=(14, 12))
-        pattern_cnt = Counter(df['形态'])
-        colors = {'组六': '#3498db', '组三': '#e74c3c', '豹子': '#f39c12'}
-        colors_list = [colors.get(k, '#95a5a6') for k in pattern_cnt.keys()]
-        explode = [0.05] * len(pattern_cnt)
-        
-        ax.pie(pattern_cnt.values(), labels=pattern_cnt.keys(), autopct='%1.1f%%', 
-               colors=colors_list, explode=explode, shadow=True, startangle=90, textprops={'fontsize': 16})
-        ax.set_title('福彩3D 形态占比', fontsize=22, fontweight='bold')
-        plt.tight_layout()
-        plt.savefig('fc3d_pattern_pie.png', dpi=200, bbox_inches='tight')
-        plt.close()
-        charts.append('fc3d_pattern_pie.png')
-        print("  ✅ 形态占比图")
-    except Exception as e:
-        print(f"  ⚠️ 形态饼图失败: {e}")
-    
-    # 图5：各位置数字频率
-    try:
-        fig, axes = plt.subplots(1, 3, figsize=(22, 10))
+        fig, axes = plt.subplots(1, 3, figsize=(18, 6))
         positions = ['百位', '十位', '个位']
         colors_bar = ['#e74c3c', '#3498db', '#27ae60']
         
         for i, pos in enumerate(positions):
             counts = df[pos].value_counts().sort_index()
-            bars = axes[i].bar(counts.index, counts.values, color=colors_bar[i], alpha=0.8, edgecolor='white', linewidth=2)
-            axes[i].set_title(f'{pos}位数字频率', fontsize=16, fontweight='bold')
-            axes[i].set_xlabel('数字', fontsize=14)
-            axes[i].set_ylabel('出现次数', fontsize=14)
+            axes[i].bar(counts.index, counts.values, color=colors_bar[i], alpha=0.8, edgecolor='white')
+            axes[i].set_title(f'{pos}', fontsize=14)
+            axes[i].set_xlabel('Number', fontsize=11)
+            axes[i].set_ylabel('Frequency', fontsize=11)
             axes[i].set_xticks(range(10))
-            axes[i].grid(True, alpha=0.2, axis='y')
-            for bar, v in zip(bars, counts.values):
-                axes[i].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.5, str(v), ha='center', fontsize=12, fontweight='bold')
+            for bar, v in zip(axes[i].patches, counts.values):
+                axes[i].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.5, str(v), ha='center', fontsize=10)
         
-        fig.suptitle('福彩3D 各位置数字频率分布', fontsize=20, fontweight='bold')
+        fig.suptitle('Position Frequency Distribution', fontsize=16)
         plt.tight_layout()
-        plt.savefig('fc3d_position_freq.png', dpi=200, bbox_inches='tight')
+        plt.savefig('fc3d_position_freq.png', dpi=150, bbox_inches='tight')
         plt.close()
         charts.append('fc3d_position_freq.png')
         print("  ✅ 位置频率图")
     except Exception as e:
         print(f"  ⚠️ 位置频率图失败: {e}")
-    
-    # 图6：奇偶走势图
-    try:
-        fig, ax = plt.subplots(figsize=(24, 12))
-        dates = [f"{row['开奖日期'].month}/{row['开奖日期'].day}" for _, row in recent_15.iterrows()]
-        periods = recent_15['期号'].tolist()
-        odd_counts = [(row['百位'] % 2) + (row['十位'] % 2) + (row['个位'] % 2) for _, row in recent_15.iterrows()]
-        
-        colors = ['#e74c3c' if x >= 3 else '#3498db' if x <= 0 else '#f39c12' for x in odd_counts]
-        ax.bar(range(len(dates)), odd_counts, color=colors, alpha=0.8, edgecolor='white', linewidth=2)
-        ax.axhline(y=3, color='#e74c3c', linestyle='--', linewidth=2.5, label='全奇线 (3个奇数)')
-        ax.axhline(y=0, color='#3498db', linestyle='--', linewidth=2.5, label='全偶线 (0个奇数)')
-        
-        for i, (x, y) in enumerate(zip(range(len(dates)), odd_counts)):
-            ax.annotate(str(y), (x, y), textcoords="offset points", xytext=(0, 15), ha='center', fontsize=14, fontweight='bold')
-        
-        ax.set_title('福彩3D 奇偶个数走势图（最近15期）', fontsize=22, fontweight='bold')
-        ax.set_xlabel('期数（日期）', fontsize=16)
-        ax.set_ylabel('奇数个数', fontsize=16)
-        ax.set_xticks(range(len(dates)))
-        ax.set_xticklabels([f"{periods[i]}\n{dates[i]}" for i in range(len(dates))], fontsize=12)
-        ax.set_yticks(range(4))
-        ax.set_ylim(-0.5, 3.5)
-        ax.legend(loc='upper right', fontsize=14)
-        ax.grid(True, alpha=0.3, axis='y')
-        ax.set_facecolor('#fafafa')
-        
-        plt.tight_layout()
-        plt.savefig('fc3d_parity_trend.png', dpi=200, bbox_inches='tight')
-        plt.close()
-        charts.append('fc3d_parity_trend.png')
-        print("  ✅ 奇偶走势图")
-    except Exception as e:
-        print(f"  ⚠️ 奇偶走势图失败: {e}")
     
     print(f"\n✅ 共生成 {len(charts)} 张走势图")
     return charts
@@ -807,9 +726,9 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
         
         <div class="glass-card">
             <div class="card-header"><span>🔄</span><h2>备选参考 · 形态匹配组合</h2></div>
-            <div class="card-body">
+            <div class="card-body"><div class="card-body">
                 <div style="display: flex; flex-wrap: wrap; gap: 16px;">
-'''
+''''''
     
     pattern_matched = [c for c in candidates if c['形态'] == predicted_pattern and c not in candidates[:5]]
     for c in pattern_matched[:12]:
@@ -819,12 +738,12 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
                         <div><span class="ball-small">{nums[0]}</span><span class="ball-small">{nums[1]}</span><span class="ball-small">{nums[2]}</span></div>
                         <div style="font-size: 12px; color: #94a3b8;">{c['得分']}分</div>
                     </div>
-'''
+''''''
     
     html += f'''
-                </div>
-            </div>
-        </div>
+                </div></div>
+            </div></div>
+        </div></div>
         
         <div class="glass-card">
             <div class="card-header"><span>📖</span><h2>评分系统 · 满分20分</h2></div>
