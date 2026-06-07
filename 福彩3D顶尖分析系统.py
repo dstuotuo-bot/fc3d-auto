@@ -188,8 +188,7 @@ def generate_charts(df):
     
     # 图1：和值走势图
     try:
-        plt.rcParams['font.sans-serif'] = ['DejaVu Sans']
-        fig, ax = plt.subplots(figsize=(16, 8))
+        fig, ax = plt.subplots(figsize=(14, 7))
         dates = [str(i+1) for i in range(len(recent_15))]
         sums = recent_15['和值'].tolist()
         
@@ -216,7 +215,7 @@ def generate_charts(df):
     
     # 图2：跨度走势图
     try:
-        fig, ax = plt.subplots(figsize=(16, 8))
+        fig, ax = plt.subplots(figsize=(14, 7))
         dates = [str(i+1) for i in range(len(recent_15))]
         spans = recent_15['跨度'].tolist()
         
@@ -428,10 +427,19 @@ def predict(df, pos_data, features, predicted_pattern):
 
 
 # ============================================================================
-# 生成HTML报告
+# 生成HTML报告（图片使用base64嵌入）
 # ============================================================================
+def image_to_base64(image_path):
+    """将图片转换为base64编码"""
+    import base64
+    if os.path.exists(image_path):
+        with open(image_path, 'rb') as f:
+            return base64.b64encode(f.read()).decode('utf-8')
+    return None
+
+
 def generate_html_report(df, pos_data, features, predicted_pattern, candidates, next_period, accuracy_result, chart_files):
-    """生成HTML报告"""
+    """生成HTML报告（图片嵌入）"""
     
     recent_5 = df.tail(5)
     
@@ -444,6 +452,35 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
     group6_pct = features['p_cnt'].get('组六', 0) / len(df) * 100
     group3_pct = features['p_cnt'].get('组三', 0) / len(df) * 100
     group_bz_pct = features['p_cnt'].get('豹子', 0) / len(df) * 100
+    
+    # 将图片转换为base64嵌入
+    sum_img_base64 = image_to_base64('fc3d_sum_trend.png')
+    span_img_base64 = image_to_base64('fc3d_span_trend.png')
+    pos_img_base64 = image_to_base64('fc3d_position_freq.png')
+    
+    # 构建图表HTML
+    charts_html = ''
+    if sum_img_base64:
+        charts_html += f'''
+                    <div class="chart-card">
+                        <h3>📈 和值走势图</h3>
+                        <img src="data:image/png;base64,{sum_img_base64}" alt="和值走势图">
+                    </div>
+'''
+    if span_img_base64:
+        charts_html += f'''
+                    <div class="chart-card">
+                        <h3>📐 跨度走势图</h3>
+                        <img src="data:image/png;base64,{span_img_base64}" alt="跨度走势图">
+                    </div>
+'''
+    if pos_img_base64:
+        charts_html += f'''
+                    <div class="chart-card">
+                        <h3>📊 位置频率图</h3>
+                        <img src="data:image/png;base64,{pos_img_base64}" alt="位置频率图">
+                    </div>
+'''
     
     acc_html = ""
     if accuracy_result:
@@ -587,7 +624,8 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
         }}
         .charts-grid {{ display: flex; flex-direction: column; gap: 32px; }}
         .chart-card {{ background: rgba(15, 23, 42, 0.8); border-radius: 20px; padding: 20px; text-align: center; }}
-        .chart-card img {{ width: 100%; border-radius: 16px; cursor: pointer; }}
+        .chart-card img {{ width: 100%; border-radius: 16px; }}
+        .chart-card h3 {{ color: #f1f5f9; margin-bottom: 15px; font-size: 18px; }}
         .badge-primary {{ background: rgba(245, 87, 108, 0.15); color: #f093fb; padding: 4px 12px; border-radius: 100px; font-size: 12px; }}
         .footer {{ text-align: center; padding: 32px; color: #475569; font-size: 13px; }}
         @media (max-width: 768px) {{
@@ -707,19 +745,10 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
         </div>
         
         <div class="glass-card">
-            <div class="card-header"><span>📈</span><h2>走势图分析（点击图片可放大）</h2></div>
+            <div class="card-header"><span>📈</span><h2>走势图分析</h2></div>
             <div class="card-body">
                 <div class="charts-grid">
-'''
-    
-    for chart in chart_files:
-        html += f'''
-                    <div class="chart-card">
-                        <a href="{chart}" target="_blank"><img src="{chart}" alt="走势图"></a>
-                    </div>
-'''
-    
-    html += f'''
+                    {charts_html}
                 </div>
             </div>
         </div>
