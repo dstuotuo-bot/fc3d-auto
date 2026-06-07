@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             width: 100%;
         }
@@ -53,7 +53,7 @@
             color: #a5b4fc;
         }
 
-        /* 卡片 - 全端圆角统一 */
+        /* 卡片 */
         .glass-card {
             background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(12px);
@@ -86,7 +86,7 @@
             padding: 20px;
         }
 
-        /* 推演网格 - 手机竖排，平板横排，电脑横排 */
+        /* 推演网格 */
         .prediction-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -105,13 +105,18 @@
             padding: 20px 16px;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .prediction-item:hover {
+            transform: scale(1.02);
+            border-color: rgba(245, 87, 108, 0.5);
         }
 
         .prediction-rank {
             font-size: 13px;
             color: #94a3b8;
             margin-bottom: 12px;
-            letter-spacing: 1px;
         }
 
         .prediction-balls {
@@ -165,7 +170,7 @@
             margin-top: 8px;
         }
 
-        /* 统计卡片网格 - 响应式 */
+        /* 统计卡片 */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -211,35 +216,63 @@
             margin-top: 4px;
         }
 
-        /* 表格 - 横向滚动适配手机 */
-        .table-wrapper {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+        /* 横排卡片布局 - 最近5期 */
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
         }
 
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 500px;
+        @media (max-width: 640px) {
+            .history-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
-        .data-table th {
-            text-align: left;
-            padding: 12px 10px;
-            color: #94a3b8;
-            font-weight: 500;
+        .history-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.2s;
+        }
+
+        .history-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(245, 87, 108, 0.3);
+        }
+
+        .history-period {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+        }
+
+        .history-date {
             font-size: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            color: #94a3b8;
+            margin-bottom: 12px;
         }
 
-        .data-table td {
-            padding: 12px 10px;
-            color: #e2e8f0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 13px;
+        .history-balls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 12px;
         }
 
-        /* 号码球 - 响应式大小 */
+        .history-info {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            font-size: 12px;
+            color: #94a3b8;
+            flex-wrap: wrap;
+        }
+
+        /* 号码球 */
         .ball-small {
             display: inline-flex;
             width: clamp(32px, 10vw, 38px);
@@ -287,7 +320,7 @@
             border-radius: 12px;
         }
 
-        /* 图表网格 - 手机竖排 */
+        /* 走势图网格 */
         .charts-grid {
             display: flex;
             flex-direction: column;
@@ -312,6 +345,11 @@
             height: auto;
             border-radius: 12px;
             cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .chart-card img:hover {
+            transform: scale(1.02);
         }
 
         /* 备选参考网格 */
@@ -360,6 +398,7 @@
 </head>
 <body>
     <div class="container">
+        <!-- 头部 -->
         <div class="hero">
             <h1>🎯 福彩3D · 智选分析</h1>
             <div class="hero-badge">
@@ -377,35 +416,146 @@
             </div>
             <div class="card-body">
                 <div class="prediction-grid">
-                    <!-- 这里放你的5注推演结果 -->
+                    <div class="prediction-item">
+                        <div class="prediction-rank">第1注 · 推荐</div>
+                        <div class="prediction-balls">
+                            <div class="ball-large">4</div>
+                            <div class="ball-large">6</div>
+                            <div class="ball-large">8</div>
+                        </div>
+                        <div><span class="prediction-score score-high">16.5分</span></div>
+                        <div class="prediction-detail">形态: 组六 | 和值: 18</div>
+                    </div>
+                    <div class="prediction-item">
+                        <div class="prediction-rank">第2注 · 推荐</div>
+                        <div class="prediction-balls">
+                            <div class="ball-large">4</div>
+                            <div class="ball-large">6</div>
+                            <div class="ball-large">2</div>
+                        </div>
+                        <div><span class="prediction-score score-mid">14.2分</span></div>
+                        <div class="prediction-detail">形态: 组六 | 和值: 12</div>
+                    </div>
+                    <div class="prediction-item">
+                        <div class="prediction-rank">第3注 · 推荐</div>
+                        <div class="prediction-balls">
+                            <div class="ball-large">8</div>
+                            <div class="ball-large">6</div>
+                            <div class="ball-large">2</div>
+                        </div>
+                        <div><span class="prediction-score score-mid">13.8分</span></div>
+                        <div class="prediction-detail">形态: 组六 | 和值: 16</div>
+                    </div>
+                    <div class="prediction-item">
+                        <div class="prediction-rank">第4注 · 推荐</div>
+                        <div class="prediction-balls">
+                            <div class="ball-large">4</div>
+                            <div class="ball-large">8</div>
+                            <div class="ball-large">2</div>
+                        </div>
+                        <div><span class="prediction-score score-low">11.5分</span></div>
+                        <div class="prediction-detail">形态: 组六 | 和值: 14</div>
+                    </div>
+                    <div class="prediction-item">
+                        <div class="prediction-rank">第5注 · 推荐</div>
+                        <div class="prediction-balls">
+                            <div class="ball-large">4</div>
+                            <div class="ball-large">0</div>
+                            <div class="ball-large">8</div>
+                        </div>
+                        <div><span class="prediction-score score-low">10.3分</span></div>
+                        <div class="prediction-detail">形态: 组六 | 和值: 12</div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- 统计卡片 -->
         <div class="stats-grid">
-            <div class="stat-card"><div class="stat-value">14</div><div class="stat-label">🎯 最常见和值</div></div>
-            <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">📐 最常见跨度</div></div>
-            <div class="stat-card"><div class="stat-value">组六</div><div class="stat-label">🔮 预测形态</div></div>
+            <div class="stat-card"><div class="stat-value">14</div><div class="stat-label">🎯 最常见和值</div><div class="stat-desc">重点关注</div></div>
+            <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">📐 最常见跨度</div><div class="stat-desc">历史最高频</div></div>
+            <div class="stat-card"><div class="stat-value">组六</div><div class="stat-label">🔮 预测形态</div><div class="stat-desc">基于转移概率</div></div>
             <div class="stat-card"><div class="stat-value">--</div><div class="stat-label">历史命中率</div><div class="stat-desc">数据积累中</div></div>
         </div>
 
-        <!-- 最近5期开奖记录 -->
+        <!-- 最近5期开奖记录 - 横排卡片式 -->
         <div class="glass-card">
             <div class="card-header">
                 <span>📋</span>
                 <h2>最近5期开奖记录</h2>
             </div>
             <div class="card-body">
-                <div class="table-wrapper">
-                    <table class="data-table">
-                        <thead>
-                            <tr><th>期号</th><th>开奖日期</th><th>开奖号码</th><th>形态</th><th>和值</th><th>跨度</th>
-                        </thead>
-                        <tbody>
-                            <!-- 这里放最近5期数据 -->
-                        </tbody>
-                    </table>
+                <div class="history-grid">
+                    <div class="history-card">
+                        <div class="history-period">2026144</div>
+                        <div class="history-date">2026-06-03</div>
+                        <div class="history-balls">
+                            <span class="ball-small">7</span>
+                            <span class="ball-small">2</span>
+                            <span class="ball-small">6</span>
+                        </div>
+                        <div class="history-info">
+                            <span class="badge-primary">组六</span>
+                            <span>和值 15</span>
+                            <span>跨度 5</span>
+                        </div>
+                    </div>
+                    <div class="history-card">
+                        <div class="history-period">2026145</div>
+                        <div class="history-date">2026-06-04</div>
+                        <div class="history-balls">
+                            <span class="ball-small">2</span>
+                            <span class="ball-small">7</span>
+                            <span class="ball-small">9</span>
+                        </div>
+                        <div class="history-info">
+                            <span class="badge-primary">组六</span>
+                            <span>和值 18</span>
+                            <span>跨度 7</span>
+                        </div>
+                    </div>
+                    <div class="history-card">
+                        <div class="history-period">2026146</div>
+                        <div class="history-date">2026-06-05</div>
+                        <div class="history-balls">
+                            <span class="ball-small">4</span>
+                            <span class="ball-small">6</span>
+                            <span class="ball-small">4</span>
+                        </div>
+                        <div class="history-info">
+                            <span class="badge-primary">组三</span>
+                            <span>和值 14</span>
+                            <span>跨度 2</span>
+                        </div>
+                    </div>
+                    <div class="history-card">
+                        <div class="history-period">2026147</div>
+                        <div class="history-date">2026-06-06</div>
+                        <div class="history-balls">
+                            <span class="ball-small">7</span>
+                            <span class="ball-small">1</span>
+                            <span class="ball-small">2</span>
+                        </div>
+                        <div class="history-info">
+                            <span class="badge-primary">组六</span>
+                            <span>和值 10</span>
+                            <span>跨度 6</span>
+                        </div>
+                    </div>
+                    <div class="history-card">
+                        <div class="history-period">2026148</div>
+                        <div class="history-date">2026-06-07</div>
+                        <div class="history-balls">
+                            <span class="ball-small">4</span>
+                            <span class="ball-small">0</span>
+                            <span class="ball-small">8</span>
+                        </div>
+                        <div class="history-info">
+                            <span class="badge-primary">组六</span>
+                            <span>和值 12</span>
+                            <span>跨度 8</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -520,6 +670,23 @@
                             <img src="fc3d_parity_trend.png" alt="奇偶走势图">
                         </a>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 备选参考 -->
+        <div class="glass-card">
+            <div class="card-header">
+                <span>🔄</span>
+                <h2>备选参考 · 形态匹配组合</h2>
+            </div>
+            <div class="card-body">
+                <div class="candidates-grid">
+                    <div class="candidate-item"><span class="ball-small">3</span><span class="ball-small">9</span><span class="ball-small">6</span><div style="font-size: 11px;">10.6分</div></div>
+                    <div class="candidate-item"><span class="ball-small">2</span><span class="ball-small">8</span><span class="ball-small">5</span><div style="font-size: 11px;">10.5分</div></div>
+                    <div class="candidate-item"><span class="ball-small">3</span><span class="ball-small">7</span><span class="ball-small">5</span><div style="font-size: 11px;">10.4分</div></div>
+                    <div class="candidate-item"><span class="ball-small">3</span><span class="ball-small">9</span><span class="ball-small">4</span><div style="font-size: 11px;">9.5分</div></div>
+                    <div class="candidate-item"><span class="ball-small">2</span><span class="ball-small">9</span><span class="ball-small">6</span><div style="font-size: 11px;">8.7分</div></div>
                 </div>
             </div>
         </div>
