@@ -1,5 +1,5 @@
 """
-福彩3D 顶尖专业级分析系统（GitHub Actions 云端优化版）
+福彩3D 顶尖专业级分析系统（完整满血版 + 全端自适应）
 功能：自动抓取 + 深度分析 + 5注推演 + HTML报告 + 历史准确率 + 走势图
 """
 
@@ -169,10 +169,10 @@ def calculate_accuracy(df):
 
 
 # ============================================================================
-# 走势图生成（云端优化版）
+# 走势图生成（完整版）
 # ============================================================================
 def generate_charts(df):
-    """生成走势图 - 云端优化版"""
+    """生成走势图 - 完整版"""
     print("\n" + "=" * 80)
     print("【生成走势图】")
     print("=" * 80)
@@ -194,14 +194,15 @@ def generate_charts(df):
         
         ax.plot(dates, sums, 'r-o', linewidth=2, markersize=8, color='#e74c3c')
         mean_sum = np.mean(sums)
-        ax.axhline(y=mean_sum, color='#3498db', linestyle='--', linewidth=2, label=f'Mean: {mean_sum:.1f}')
+        ax.axhline(y=mean_sum, color='#3498db', linestyle='--', linewidth=2, label=f'均值: {mean_sum:.1f}')
+        ax.axhspan(9, 16, alpha=0.2, color='#2ecc71', label='常见区间9-16')
         
         for i, (x, y) in enumerate(zip(dates, sums)):
             ax.annotate(str(y), (x, y), textcoords="offset points", xytext=(0, 10), ha='center', fontsize=10)
         
-        ax.set_title('Sum Trend (Last 15 Periods)', fontsize=16)
-        ax.set_xlabel('Period', fontsize=12)
-        ax.set_ylabel('Sum', fontsize=12)
+        ax.set_title('和值走势图（最近15期）', fontsize=16)
+        ax.set_xlabel('期数', fontsize=12)
+        ax.set_ylabel('和值', fontsize=12)
         ax.legend()
         ax.grid(True, alpha=0.3)
         
@@ -221,14 +222,14 @@ def generate_charts(df):
         
         ax.plot(dates, spans, 'g-s', linewidth=2, markersize=8, color='#27ae60')
         mean_span = np.mean(spans)
-        ax.axhline(y=mean_span, color='#e67e22', linestyle='--', linewidth=2, label=f'Mean: {mean_span:.1f}')
+        ax.axhline(y=mean_span, color='#e67e22', linestyle='--', linewidth=2, label=f'均值: {mean_span:.1f}')
         
         for i, (x, y) in enumerate(zip(dates, spans)):
             ax.annotate(str(y), (x, y), textcoords="offset points", xytext=(0, 10), ha='center', fontsize=10)
         
-        ax.set_title('Span Trend (Last 15 Periods)', fontsize=16)
-        ax.set_xlabel('Period', fontsize=12)
-        ax.set_ylabel('Span', fontsize=12)
+        ax.set_title('跨度走势图（最近15期）', fontsize=16)
+        ax.set_xlabel('期数', fontsize=12)
+        ax.set_ylabel('跨度', fontsize=12)
         ax.set_ylim(-0.5, 9.5)
         ax.set_yticks(range(10))
         ax.legend()
@@ -251,14 +252,14 @@ def generate_charts(df):
         for i, pos in enumerate(positions):
             counts = df[pos].value_counts().sort_index()
             axes[i].bar(counts.index, counts.values, color=colors_bar[i], alpha=0.8, edgecolor='white')
-            axes[i].set_title(f'{pos}', fontsize=14)
-            axes[i].set_xlabel('Number', fontsize=11)
-            axes[i].set_ylabel('Frequency', fontsize=11)
+            axes[i].set_title(f'{pos}位', fontsize=14)
+            axes[i].set_xlabel('数字', fontsize=11)
+            axes[i].set_ylabel('出现次数', fontsize=11)
             axes[i].set_xticks(range(10))
             for bar, v in zip(axes[i].patches, counts.values):
                 axes[i].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.5, str(v), ha='center', fontsize=10)
         
-        fig.suptitle('Position Frequency Distribution', fontsize=16)
+        fig.suptitle('各位置数字频率分布', fontsize=16)
         plt.tight_layout()
         plt.savefig('fc3d_position_freq.png', dpi=150, bbox_inches='tight')
         plt.close()
@@ -339,17 +340,26 @@ def analyze_features(df):
     spans = df['跨度'].tolist()
     span_cnt = Counter(spans)
     
+    # 奇偶组合
     parity = []
     for _, r in df.iterrows():
         p = ('奇' if r['百位']%2 else '偶') + ('奇' if r['十位']%2 else '偶') + ('奇' if r['个位']%2 else '偶')
         parity.append(p)
     p_cnt = Counter(parity)
     
+    # 大小组合
     size = []
     for _, r in df.iterrows():
         s = ('大' if r['百位']>=5 else '小') + ('大' if r['十位']>=5 else '小') + ('大' if r['个位']>=5 else '小')
         size.append(s)
     s_cnt = Counter(size)
+    
+    # 和值区间分布
+    intervals = [(0, 4), (5, 8), (9, 12), (13, 16), (17, 20), (21, 27)]
+    interval_counts = {}
+    for low, high in intervals:
+        cnt = len([s for s in sums if low <= s <= high])
+        interval_counts[f'{low}-{high}'] = cnt
     
     return {
         'common_sum': sum_cnt.most_common(1)[0][0],
@@ -358,7 +368,9 @@ def analyze_features(df):
         'common_size': s_cnt.most_common(1)[0][0],
         'span_cnt': span_cnt,
         'p_cnt': p_cnt,
-        's_cnt': s_cnt
+        's_cnt': s_cnt,
+        'interval_counts': interval_counts,
+        'avg_sum': np.mean(sums)
     }
 
 
@@ -427,7 +439,7 @@ def predict(df, pos_data, features, predicted_pattern):
 
 
 # ============================================================================
-# 生成HTML报告（图片使用base64嵌入）
+# 生成HTML报告（完整满血版 + 全端自适应）
 # ============================================================================
 def image_to_base64(image_path):
     """将图片转换为base64编码"""
@@ -439,7 +451,7 @@ def image_to_base64(image_path):
 
 
 def generate_html_report(df, pos_data, features, predicted_pattern, candidates, next_period, accuracy_result, chart_files):
-    """生成HTML报告（图片嵌入）"""
+    """生成HTML报告 - 完整满血版 + 全端自适应"""
     
     recent_5 = df.tail(5)
     
@@ -486,7 +498,7 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
     if accuracy_result:
         acc = accuracy_result['accuracy']
         acc_html = f'''
-        <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="stat-card">
             <div class="stat-value">{acc:.1f}%</div>
             <div class="stat-label">历史命中率</div>
             <div class="stat-desc">基于27注热号组合 | 测试{accuracy_result['total_tested']}期 命中{accuracy_result['hit_count']}期</div>
@@ -494,7 +506,7 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
         '''
     else:
         acc_html = '''
-        <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="stat-card">
             <div class="stat-value">--</div>
             <div class="stat-label">历史命中率</div>
             <div class="stat-desc">数据积累中，继续运行即可显示</div>
@@ -505,134 +517,335 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
     <title>福彩3D · 智选分析报告</title>
     <style>
-        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+        
         body {{
-            font-family: 'Microsoft YaHei', 'PingFang SC', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
             min-height: 100vh;
-            padding: 32px 24px;
+            padding: 16px;
         }}
-        .container {{ max-width: 1600px; margin: 0 auto; }}
-        .hero {{ text-align: center; margin-bottom: 40px; }}
+        
+        /* 响应式容器 - 全端自适应 */
+        .container {{
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }}
+        
+        /* 头部 */
+        .hero {{
+            text-align: center;
+            margin-bottom: 24px;
+        }}
+        
         .hero h1 {{
-            font-size: 48px;
+            font-size: clamp(24px, 6vw, 42px);
             font-weight: 800;
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            margin-bottom: 8px;
         }}
+        
         .hero-badge {{
-            display: inline-flex;
-            gap: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 16px;
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
-            padding: 8px 24px;
+            padding: 8px 16px;
             border-radius: 100px;
+            font-size: 12px;
             color: #a5b4fc;
         }}
+        
+        /* 卡片 - 全端圆角统一 */
         .glass-card {{
             background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(12px);
-            border-radius: 28px;
+            border-radius: 24px;
             border: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             overflow: hidden;
         }}
+        
         .card-header {{
-            padding: 20px 28px;
+            padding: 16px 20px;
             border-bottom: 1px solid rgba(255,255,255,0.08);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            flex-wrap: wrap;
         }}
-        .card-header h2 {{ font-size: 20px; font-weight: 600; color: #f1f5f9; }}
-        .card-body {{ padding: 24px 28px; }}
-        .prediction-grid {{ display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }}
+        
+        .card-header h2 {{
+            font-size: 18px;
+            font-weight: 600;
+            color: #f1f5f9;
+        }}
+        
+        .card-body {{
+            padding: 20px;
+        }}
+        
+        /* 推演网格 - 手机竖排，平板横排，电脑横排 */
+        .prediction-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+        }}
+        
+        @media (max-width: 640px) {{
+            .prediction-grid {{
+                grid-template-columns: 1fr;
+            }}
+        }}
+        
         .prediction-item {{
             background: linear-gradient(145deg, #1e293b, #0f172a);
-            border-radius: 32px;
-            padding: 24px 20px;
+            border-radius: 28px;
+            padding: 20px 16px;
             text-align: center;
-            min-width: 150px;
             border: 1px solid rgba(255,255,255,0.05);
         }}
-        .prediction-rank {{ font-size: 14px; color: #94a3b8; margin-bottom: 16px; }}
-        .prediction-balls {{ display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; }}
+        
+        .prediction-rank {{
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }}
+        
+        .prediction-balls {{
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }}
+        
         .ball-large {{
-            width: 68px; height: 68px;
+            width: clamp(55px, 15vw, 70px);
+            height: clamp(55px, 15vw, 70px);
             background: linear-gradient(145deg, #f093fb, #f5576c);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: clamp(24px, 6vw, 32px);
             font-weight: 800;
             color: white;
             box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }}
+        
         .prediction-score {{
             display: inline-block;
-            padding: 6px 16px;
+            padding: 4px 14px;
             border-radius: 40px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
         }}
+        
         .score-high {{ background: linear-gradient(135deg, #f5576c, #f093fb); color: white; }}
         .score-mid {{ background: linear-gradient(135deg, #f59e0b, #f97316); color: white; }}
         .score-low {{ background: linear-gradient(135deg, #10b981, #34d399); color: white; }}
-        .prediction-detail {{ font-size: 12px; color: #94a3b8; margin-top: 8px; }}
-        .stats-grid {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 24px; }}
+        
+        .prediction-detail {{
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 8px;
+        }}
+        
+        /* 统计卡片网格 - 响应式 */
+        .stats-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }}
+        
+        @media (max-width: 640px) {{
+            .stats-grid {{
+                grid-template-columns: repeat(2, 1fr);
+            }}
+        }}
+        
+        @media (max-width: 400px) {{
+            .stats-grid {{
+                grid-template-columns: 1fr;
+            }}
+        }}
+        
         .stat-card {{
             background: rgba(30, 41, 59, 0.6);
-            border-radius: 24px;
-            padding: 20px;
+            border-radius: 20px;
+            padding: 16px;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.05);
         }}
-        .stat-value {{ font-size: 36px; font-weight: 800; color: #f1f5f9; margin-bottom: 8px; }}
-        .stat-label {{ font-size: 14px; color: #94a3b8; }}
-        .stat-desc {{ font-size: 11px; color: #64748b; }}
-        .data-table {{ width: 100%; border-collapse: collapse; }}
-        .data-table th {{ text-align: left; padding: 14px 12px; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.08); }}
-        .data-table td {{ padding: 14px 12px; color: #e2e8f0; border-bottom: 1px solid rgba(255,255,255,0.05); }}
+        
+        .stat-value {{
+            font-size: clamp(28px, 8vw, 36px);
+            font-weight: 800;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+        }}
+        
+        .stat-label {{
+            font-size: 12px;
+            color: #94a3b8;
+        }}
+        
+        .stat-desc {{
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 4px;
+        }}
+        
+        /* 表格 - 横向滚动适配手机 */
+        .table-wrapper {{
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }}
+        
+        .data-table {{
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }}
+        
+        .data-table th {{
+            text-align: left;
+            padding: 12px 10px;
+            color: #94a3b8;
+            font-weight: 500;
+            font-size: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }}
+        
+        .data-table td {{
+            padding: 12px 10px;
+            color: #e2e8f0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 13px;
+        }}
+        
+        /* 号码球 - 响应式大小 */
         .ball-small {{
-            display: inline-flex; width: 36px; height: 36px;
+            display: inline-flex;
+            width: clamp(32px, 10vw, 38px);
+            height: clamp(32px, 10vw, 38px);
             background: linear-gradient(145deg, #f093fb, #f5576c);
             border-radius: 50%;
-            align-items: center; justify-content: center;
-            font-weight: 700; font-size: 16px;
-            color: white; margin: 0 3px;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: clamp(14px, 4vw, 16px);
+            color: white;
+            margin: 0 2px;
         }}
+        
         .ball-blue {{ background: linear-gradient(145deg, #4facfe, #00f2fe); }}
         .ball-green {{ background: linear-gradient(145deg, #43e97b, #38f9d7); }}
         .ball-purple {{ background: linear-gradient(145deg, #a18cd1, #fbc2eb); }}
-        .progress-bar {{ background: rgba(255,255,255,0.1); border-radius: 12px; height: 32px; overflow: hidden; margin: 12px 0; }}
+        
+        /* 进度条 */
+        .progress-bar {{
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            height: 32px;
+            overflow: hidden;
+            margin: 12px 0;
+        }}
+        
         .progress-fill {{
             background: linear-gradient(90deg, #f093fb, #f5576c);
             height: 100%;
             display: flex;
             align-items: center;
-            padding-left: 16px;
+            padding-left: 12px;
             color: white;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             border-radius: 12px;
         }}
-        .charts-grid {{ display: flex; flex-direction: column; gap: 32px; }}
-        .chart-card {{ background: rgba(15, 23, 42, 0.8); border-radius: 20px; padding: 20px; text-align: center; }}
-        .chart-card img {{ width: 100%; border-radius: 16px; }}
-        .chart-card h3 {{ color: #f1f5f9; margin-bottom: 15px; font-size: 18px; }}
-        .badge-primary {{ background: rgba(245, 87, 108, 0.15); color: #f093fb; padding: 4px 12px; border-radius: 100px; font-size: 12px; }}
-        .footer {{ text-align: center; padding: 32px; color: #475569; font-size: 13px; }}
-        @media (max-width: 768px) {{
-            .stats-grid {{ grid-template-columns: repeat(2, 1fr); }}
-            .ball-large {{ width: 50px; height: 50px; font-size: 24px; }}
-            .hero h1 {{ font-size: 32px; }}
+        
+        /* 图表网格 - 手机竖排 */
+        .charts-grid {{
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
         }}
+        
+        .chart-card {{
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+        }}
+        
+        .chart-card h3 {{
+            color: #f1f5f9;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }}
+        
+        .chart-card img {{
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+        }}
+        
+        /* 备选参考网格 */
+        .candidates-grid {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }}
+        
+        .candidate-item {{
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 10px 16px;
+            text-align: center;
+        }}
+        
+        /* 评分说明网格 */
+        .score-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+        }}
+        
+        .badge-primary {{
+            background: rgba(245, 87, 108, 0.15);
+            color: #f093fb;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            display: inline-block;
+        }}
+        
+        .footer {{
+            text-align: center;
+            padding: 24px;
+            color: #475569;
+            font-size: 11px;
+        }}
+        
+        /* 颜色类 */
+        .text-white {{ color: white !important; font-weight: bold; }}
     </style>
 </head>
 <body>
@@ -646,8 +859,12 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
             </div>
         </div>
         
+        <!-- 推演结果 -->
         <div class="glass-card">
-            <div class="card-header"><span>⭐</span><h2>智能推演 · 下一期预测</h2></div>
+            <div class="card-header">
+                <span style="font-size: 24px;">⭐</span>
+                <h2>智能推演 · 下一期预测</h2>
+            </div>
             <div class="card-body">
                 <div class="prediction-grid">
 '''
@@ -673,41 +890,63 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
             </div>
         </div>
         
+        <!-- 统计卡片 -->
         <div class="stats-grid">
-            <div class="stat-card"><div class="stat-value">{features['common_sum']}</div><div class="stat-label">🎯 最常见和值</div></div>
-            <div class="stat-card"><div class="stat-value">{features['span_cnt'].most_common(1)[0][0]}</div><div class="stat-label">📐 最常见跨度</div></div>
-            <div class="stat-card"><div class="stat-value">{predicted_pattern}</div><div class="stat-label">🔮 预测形态</div></div>
+            <div class="stat-card">
+                <div class="stat-value">{features['common_sum']}</div>
+                <div class="stat-label">🎯 最常见和值</div>
+                <div class="stat-desc">重点关注</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{features['span_cnt'].most_common(1)[0][0]}</div>
+                <div class="stat-label">📐 最常见跨度</div>
+                <div class="stat-desc">历史最高频</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{predicted_pattern}</div>
+                <div class="stat-label">🔮 预测形态</div>
+                <div class="stat-desc">基于转移概率</div>
+            </div>
             {acc_html}
         </div>
         
+        <!-- 最近5期开奖记录 -->
         <div class="glass-card">
-            <div class="card-header"><span>📋</span><h2>最近5期开奖记录</h2></div>
+            <div class="card-header">
+                <span style="font-size: 24px;">📋</span>
+                <h2>最近5期开奖记录</h2>
+            </div>
             <div class="card-body">
-                <table class="data-table">
-                    <thead><tr><th>期号</th><th>开奖日期</th><th>开奖号码</th><th>形态</th><th>和值</th><th>跨度</th></tr></thead>
-                    <tbody>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>期号</th><th>开奖日期</th><th>开奖号码</th><th>形态</th><th>和值</th><th>跨度</th></tr>
+                        </thead>
+                        <tbody>
 '''
     
     for _, row in recent_5.iterrows():
         nums = row['开奖号码']
         html += f'''
-                        <tr>
-                            <td>{row['期号']}</td>
-                            <td>{row['开奖日期'].strftime('%Y-%m-%d')}</td>
-                            <td><span class="ball-small">{nums[0]}</span><span class="ball-small">{nums[1]}</span><span class="ball-small">{nums[2]}</span></td>
-                            <td>{row['形态']}</td>
-                            <td>{row['和值']}</td>
-                            <td>{row['跨度']}</td>
-                        </tr>
+                            <tr>
+                                <td>{row['期号']}</td>
+                                <td>{row['开奖日期'].strftime('%Y-%m-%d')}</td>
+                                <td><span class="ball-small">{nums[0]}</span><span class="ball-small">{nums[1]}</span><span class="ball-small">{nums[2]}</span></td>
+                                <td>{row['形态']}</td>
+                                <td>{row['和值']}</td>
+                                <td>{row['跨度']}</td>
+                            </tr>
 '''
     
     html += f'''
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         
-        <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr);">
+        <!-- 形态分布 + 奇偶大小 -->
+        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
             <div class="glass-card" style="margin:0;">
                 <div class="card-header"><span>🎨</span><h2>形态分布</h2></div>
                 <div class="card-body">
@@ -719,14 +958,16 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
             <div class="glass-card" style="margin:0;">
                 <div class="card-header"><span>🔢</span><h2>奇偶 & 大小</h2></div>
                 <div class="card-body">
-                    <div><span class="badge-primary">最常见奇偶</span> <strong>{features['common_parity']}</strong></div>
-                    <div style="margin-top: 12px;"><span class="badge-primary">最常见大小</span> <strong>{features['common_size']}</strong></div>
-                    <div style="margin-top: 16px;"><span class="badge-primary">和值Top5</span> {features['common_sum_top5']}</div>
+                    <div><span class="badge-primary">最常见奇偶</span> <strong style="color:#f1f5f9;">{features['common_parity']}</strong></div>
+                    <div style="margin-top: 12px;"><span class="badge-primary">最常见大小</span> <strong style="color:#f1f5f9;">{features['common_size']}</strong></div>
+                    <div style="margin-top: 16px;"><span class="badge-primary">和值Top5</span> <span style="color:#a5b4fc;">{features['common_sum_top5']}</span></div>
+                    <div style="margin-top: 12px;"><span class="badge-primary">平均和值</span> <span style="color:#a5b4fc;">{features['avg_sum']:.1f}</span></div>
                 </div>
             </div>
         </div>
         
-        <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <!-- 三位置分析 -->
+        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
 '''
     
     for pos, color in [('百位', '#ff6b6b'), ('十位', '#45b7d1'), ('个位', '#96ceb4')]:
@@ -734,18 +975,27 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
             <div class="glass-card" style="margin:0;">
                 <div class="card-header"><span>📍</span><h2>{pos}</h2></div>
                 <div class="card-body">
-                    <div><span class="badge-primary">热号Top3</span> <strong>{pos_data[pos]['top3']}</strong></div>
-                    <div style="margin-top: 16px; font-size: 12px; color: #94a3b8;">合理性评分:</div>
+                    <div><span class="badge-primary">热号Top3</span> <strong style="color:#f1f5f9; font-size: 18px;">{pos_data[pos]['top3']}</strong></div>
+                    <div style="margin-top: 16px; font-size: 12px; color: #94a3b8;">合理性评分Top5:</div>
+                    <div style="margin-top: 8px;">
 '''
         for num, score in pos_scores[pos][:5]:
             html += f'<span class="ball-small" style="background: {color}; width: 32px; height: 32px; font-size: 14px;">{num}</span> '
-        html += f'</div></div>'
+        html += f'''
+                    </div>
+                </div>
+            </div>
+'''
     
     html += f'''
         </div>
         
+        <!-- 走势图 -->
         <div class="glass-card">
-            <div class="card-header"><span>📈</span><h2>走势图分析</h2></div>
+            <div class="card-header">
+                <span>📈</span>
+                <h2>走势图分析（点击图片可放大）</h2>
+            </div>
             <div class="card-body">
                 <div class="charts-grid">
                     {charts_html}
@@ -753,19 +1003,23 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
             </div>
         </div>
         
+        <!-- 备选参考 -->
         <div class="glass-card">
-            <div class="card-header"><span>🔄</span><h2>备选参考 · 形态匹配组合</h2></div>
+            <div class="card-header">
+                <span>🔄</span>
+                <h2>备选参考 · 形态匹配组合</h2>
+            </div>
             <div class="card-body">
-                <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+                <div class="candidates-grid">
 '''
     
     pattern_matched = [c for c in candidates if c['形态'] == predicted_pattern and c not in candidates[:5]]
     for c in pattern_matched[:12]:
         nums = list(c['号码'])
         html += f'''
-                    <div style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 12px 18px; text-align: center;">
+                    <div class="candidate-item">
                         <div><span class="ball-small">{nums[0]}</span><span class="ball-small">{nums[1]}</span><span class="ball-small">{nums[2]}</span></div>
-                        <div style="font-size: 12px; color: #94a3b8;">{c['得分']}分</div>
+                        <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">{c['得分']}分</div>
                     </div>
 '''
     
@@ -774,17 +1028,21 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
             </div>
         </div>
         
+        <!-- 评分说明 -->
         <div class="glass-card">
-            <div class="card-header"><span>📖</span><h2>评分系统 · 满分20分</h2></div>
+            <div class="card-header">
+                <span>📖</span>
+                <h2>评分系统 · 满分20分</h2>
+            </div>
             <div class="card-body">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-                    <div><span class="badge-primary">🎯 和值精确</span> +5分</div>
-                    <div><span class="badge-primary">📊 和值接近</span> +2分</div>
-                    <div><span class="badge-primary">✨ 奇偶匹配</span> +4分</div>
-                    <div><span class="badge-primary">📏 大小匹配</span> +4分</div>
-                    <div><span class="badge-primary">🔮 形态匹配</span> +3分</div>
-                    <div><span class="badge-primary">📍 位置合理性</span> +3分</div>
-                    <div><span class="badge-primary">🛡️ 防重奖励</span> +1分</div>
+                <div class="score-grid">
+                    <div><span class="badge-primary">🎯 和值精确</span> <span class="text-white">+5分</span></div>
+                    <div><span class="badge-primary">📊 和值接近</span> <span class="text-white">+2分</span></div>
+                    <div><span class="badge-primary">✨ 奇偶匹配</span> <span class="text-white">+4分</span></div>
+                    <div><span class="badge-primary">📏 大小匹配</span> <span class="text-white">+4分</span></div>
+                    <div><span class="badge-primary">🔮 形态匹配</span> <span class="text-white">+3分</span></div>
+                    <div><span class="badge-primary">📍 位置合理性</span> <span class="text-white">+3分</span></div>
+                    <div><span class="badge-primary">🛡️ 防重奖励</span> <span class="text-white">+1分</span></div>
                 </div>
             </div>
         </div>
