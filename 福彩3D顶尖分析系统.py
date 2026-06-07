@@ -734,7 +734,7 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
     for c in pattern_matched[:12]:
         nums = list(c['号码'])
         html += f'''
-                    <div style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 12px 18px; text-align: center;">
+    <div style="background: rgba(255,255,255,0.05); border-radius: 20px; padding: 12px 18px; text-align: center;">
                         <div><span class="ball-small">{nums[0]}</span><span class="ball-small">{nums[1]}</span><span class="ball-small">{nums[2]}</span></div>
                         <div style="font-size: 12px; color: #94a3b8;">{c['得分']}分</div>
                     </div>
