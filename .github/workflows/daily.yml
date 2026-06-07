@@ -1,46 +1,45 @@
-name: 福彩3D自动分析姓名: 福彩3D自动分析
+name: 福彩3D自动分析
 
-on:在:on:在:
-  schedule:日程:
-    - cron: '0 10 * * *'    - cron: '0 10 * * *'
-  workflow_dispatch:工作流调度:
+on:
+  schedule:
+    - cron: '0 10 * * *'
+  workflow_dispatch:
 
-jobs:工作:jobs:工作:
-  analyze:分析:
-    runs-on: ubuntu-latest继续: ubuntu-latest
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
     
-    steps:步骤:
-    - name: 检出代码    - 姓名: 检出代码
-      uses: actions/checkout@v4用途: actions/checkout@v4
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
     
-    - name: 设置Python环境    - 姓名: 设置Python环境
-      uses: actions/setup-python@v5用途: actions/setup-python@v5
-      with:和:
-        python-version: '3.11'python版本: '3.11'
+    - name: 设置Python环境
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
     
-    - name: 安装依赖库    - 姓名: 安装依赖库
-      run: |跑步: |
-        pip install pandas numpy matplotlib requests beautifulsoup4 openpyxl使用 pip 安装 pandas、numpy、matplotlib、requests、beautifulsoup4 和 openpyxl使用 pip 安装 pandas、numpy、matplotlib、requests、beautifulsoup4 和 openpyxl
+    - name: 安装依赖库
+      run: |
+        pip install pandas numpy matplotlib requests beautifulsoup4 openpyxl lxml
     
-    - name: 运行分析程序    - 姓名: 运行分析程序
-      run: python 福彩3D顶尖分析系统.py跑步: python 福彩3D顶尖分析系统.py
-      continue-on-error: false
+    - name: 运行分析程序
+      run: python 福彩3D顶尖分析系统.py
     
-    - name: 列出文件
-      run: ls -la
+    - name: 列出文件    - 姓名: 列出文件
+      run: ls -la跑步: ls -la
     
-    - name: 检查报告是否存在
-      run: |跑步: |
-        if [ -f "fc3d_report.html" ]; then如果 [ -f "fc3d_report.html" ]；则
-          echo "报告文件存在"echo "报告文件存在"
-        else别的else别的
-          echo "报告文件不存在"echo "报告文件不存在"echo "报告文件不存在"echo "报告文件不存在"
-          exit 1出口 1exit 1出口 1
-        fi是
+    - name: 检查报告
+      run: |
+        if [ -f "fc3d_report.html" ]; then
+          echo "报告文件存在"
+        else
+          echo "报告文件不存在"
+          exit 1
+        fi
     
-    - name: 上传报告    - 姓名: 上传报告
-      uses: actions/upload-artifact@v4用途: actions/upload-artifact@v4
-      with:和:with:和:
-        name: fc3d-report姓名: fc3d报告
-        path: fc3d_report.html小路: fc3d_report.html
-        retention-days: 7保留天数: 7
+    - name: 上传报告
+      uses: actions/upload-artifact@v4
+      with:
+        name: fc3d-report
+        path: fc3d_report.html
+        retention-days: 7
