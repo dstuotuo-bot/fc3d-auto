@@ -5,6 +5,9 @@ on:
     - cron: '0 10 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   analyze:
     runs-on: ubuntu-latest
@@ -38,5 +41,3 @@ jobs:
         publish_dir: ./
         publish_branch: gh-pages
         keep_files: false
-        user_name: github-actions[bot]
-        user_email: github-actions[bot]@users.noreply.github.com
