@@ -22,20 +22,16 @@ jobs:
       run: |
         pip install pandas numpy matplotlib requests beautifulsoup4 openpyxl lxml
     
+    - name: 安装中文字体
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y fonts-wqy-microhei
+    
     - name: 运行分析程序
       run: python 福彩3D顶尖分析系统.py
     
-    - name: 列出文件    - 姓名: 列出文件
-      run: ls -la跑步: ls -la
-    
-    - name: 检查报告
-      run: |
-        if [ -f "fc3d_report.html" ]; then
-          echo "报告文件存在"
-        else
-          echo "报告文件不存在"
-          exit 1
-        fi
+    - name: 列出文件
+      run: ls -la
     
     - name: 上传报告
       uses: actions/upload-artifact@v4
