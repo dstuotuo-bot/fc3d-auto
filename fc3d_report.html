@@ -11,11 +11,43 @@
             box-sizing: border-box;
         }
 
+        /* 加载动画 */
+        .loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid #f5576c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
             min-height: 100vh;
             padding: 16px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        body.loaded {
+            opacity: 1;
         }
 
         .container {
@@ -28,6 +60,17 @@
         .hero {
             text-align: center;
             margin-bottom: 24px;
+            animation: fadeInDown 0.6s ease;
+        }
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .hero h1 {
@@ -53,6 +96,33 @@
             color: #a5b4fc;
         }
 
+        /* 刷新按钮 */
+        .refresh-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            z-index: 100;
+            border: none;
+            color: white;
+            font-size: 24px;
+        }
+        .refresh-btn:hover {
+            transform: scale(1.1) rotate(180deg);
+        }
+        .refresh-btn:active {
+            transform: scale(0.95);
+        }
+
         /* 卡片 */
         .glass-card {
             background: rgba(30, 41, 59, 0.7);
@@ -61,6 +131,23 @@
             border: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 20px;
             overflow: hidden;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border-color: rgba(245, 87, 108, 0.3);
         }
 
         .card-header {
@@ -71,17 +158,14 @@
             gap: 10px;
             flex-wrap: wrap;
         }
-
         .card-header span {
             font-size: 24px;
         }
-
         .card-header h2 {
             font-size: 18px;
             font-weight: 600;
             color: #f1f5f9;
         }
-
         .card-body {
             padding: 20px;
         }
@@ -92,7 +176,6 @@
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 16px;
         }
-
         @media (max-width: 640px) {
             .prediction-grid {
                 grid-template-columns: 1fr;
@@ -106,11 +189,15 @@
             text-align: center;
             border: 1px solid rgba(255,255,255,0.05);
             transition: all 0.3s ease;
+            cursor: pointer;
         }
-
         .prediction-item:hover {
             transform: scale(1.02);
             border-color: rgba(245, 87, 108, 0.5);
+            box-shadow: 0 0 20px rgba(245, 87, 108, 0.2);
+        }
+        .prediction-item:active {
+            transform: scale(0.98);
         }
 
         .prediction-rank {
@@ -139,6 +226,10 @@
             font-weight: 800;
             color: white;
             box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        .ball-large:hover {
+            transform: scale(1.08);
         }
 
         .prediction-score {
@@ -148,17 +239,14 @@
             font-size: 13px;
             font-weight: 600;
         }
-
         .score-high {
             background: linear-gradient(135deg, #f5576c, #f093fb);
             color: white;
         }
-
         .score-mid {
             background: linear-gradient(135deg, #f59e0b, #f97316);
             color: white;
         }
-
         .score-low {
             background: linear-gradient(135deg, #10b981, #34d399);
             color: white;
@@ -177,13 +265,11 @@
             gap: 16px;
             margin-bottom: 20px;
         }
-
         @media (max-width: 640px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
-
         @media (max-width: 400px) {
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -196,6 +282,12 @@
             padding: 16px;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            background: rgba(30, 41, 59, 0.8);
         }
 
         .stat-value {
@@ -204,12 +296,10 @@
             color: #f1f5f9;
             margin-bottom: 6px;
         }
-
         .stat-label {
             font-size: 12px;
             color: #94a3b8;
         }
-
         .stat-desc {
             font-size: 10px;
             color: #64748b;
@@ -222,7 +312,6 @@
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 16px;
         }
-
         @media (max-width: 640px) {
             .history-grid {
                 grid-template-columns: 1fr;
@@ -236,11 +325,15 @@
             text-align: center;
             border: 1px solid rgba(255,255,255,0.08);
             transition: all 0.2s;
+            cursor: pointer;
         }
-
         .history-card:hover {
             transform: translateY(-2px);
             border-color: rgba(245, 87, 108, 0.3);
+            background: rgba(30, 41, 59, 0.8);
+        }
+        .history-card:active {
+            transform: scale(0.98);
         }
 
         .history-period {
@@ -249,20 +342,17 @@
             color: #f1f5f9;
             margin-bottom: 6px;
         }
-
         .history-date {
             font-size: 12px;
             color: #94a3b8;
             margin-bottom: 12px;
         }
-
         .history-balls {
             display: flex;
             justify-content: center;
             gap: 10px;
             margin-bottom: 12px;
         }
-
         .history-info {
             display: flex;
             justify-content: center;
@@ -285,16 +375,18 @@
             font-size: clamp(14px, 4vw, 16px);
             color: white;
             margin: 0 2px;
+            transition: transform 0.2s;
+        }
+        .ball-small:hover {
+            transform: scale(1.1);
         }
 
         .ball-blue {
             background: linear-gradient(145deg, #4facfe, #00f2fe);
         }
-
         .ball-green {
             background: linear-gradient(145deg, #43e97b, #38f9d7);
         }
-
         .ball-purple {
             background: linear-gradient(145deg, #a18cd1, #fbc2eb);
         }
@@ -307,7 +399,6 @@
             overflow: hidden;
             margin: 12px 0;
         }
-
         .progress-fill {
             background: linear-gradient(90deg, #f093fb, #f5576c);
             height: 100%;
@@ -318,6 +409,7 @@
             font-size: 12px;
             font-weight: 500;
             border-radius: 12px;
+            transition: width 0.5s ease;
         }
 
         /* 走势图网格 */
@@ -326,20 +418,22 @@
             flex-direction: column;
             gap: 24px;
         }
-
         .chart-card {
             background: rgba(15, 23, 42, 0.8);
             border-radius: 20px;
             padding: 16px;
             text-align: center;
+            transition: all 0.3s ease;
         }
-
+        .chart-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
         .chart-card h3 {
             color: #f1f5f9;
             margin-bottom: 12px;
             font-size: 16px;
         }
-
         .chart-card img {
             width: 100%;
             height: auto;
@@ -347,7 +441,6 @@
             cursor: pointer;
             transition: transform 0.2s;
         }
-
         .chart-card img:hover {
             transform: scale(1.02);
         }
@@ -359,12 +452,17 @@
             gap: 10px;
             justify-content: center;
         }
-
         .candidate-item {
             background: rgba(255,255,255,0.05);
             border-radius: 20px;
             padding: 10px 16px;
             text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .candidate-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: scale(1.05);
         }
 
         /* 评分说明网格 */
@@ -372,6 +470,16 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 10px;
+        }
+        .score-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 8px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .score-item:hover {
+            background: rgba(255,255,255,0.08);
         }
 
         .badge-primary {
@@ -389,16 +497,23 @@
             color: #475569;
             font-size: 11px;
         }
-
         .text-white {
             color: white !important;
             font-weight: bold;
         }
+
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- 头部 -->
+    <div class="loader-wrapper" id="loader">
+        <div class="loader"></div>
+    </div>
+
+    <div class="container" id="mainContent">
         <div class="hero">
             <h1>🎯 福彩3D · 智选分析</h1>
             <div class="hero-badge">
@@ -406,6 +521,11 @@
                 <span>⚡ 下一期: 2026149</span>
                 <span>📊 基于 180 期历史数据</span>
             </div>
+        </div>
+
+        <!-- 刷新按钮 -->
+        <div class="refresh-btn" onclick="location.reload();" title="刷新数据">
+            🔄
         </div>
 
         <!-- 推演结果 -->
@@ -478,7 +598,7 @@
             <div class="stat-card"><div class="stat-value">--</div><div class="stat-label">历史命中率</div><div class="stat-desc">数据积累中</div></div>
         </div>
 
-        <!-- 最近5期开奖记录 - 横排卡片式 -->
+        <!-- 最近5期开奖记录 -->
         <div class="glass-card">
             <div class="card-header">
                 <span>📋</span>
@@ -699,13 +819,13 @@
             </div>
             <div class="card-body">
                 <div class="score-grid">
-                    <div><span class="badge-primary">🎯 和值精确</span> <span class="text-white">+5分</span></div>
-                    <div><span class="badge-primary">📊 和值接近</span> <span class="text-white">+2分</span></div>
-                    <div><span class="badge-primary">✨ 奇偶匹配</span> <span class="text-white">+4分</span></div>
-                    <div><span class="badge-primary">📏 大小匹配</span> <span class="text-white">+4分</span></div>
-                    <div><span class="badge-primary">🔮 形态匹配</span> <span class="text-white">+3分</span></div>
-                    <div><span class="badge-primary">📍 位置合理性</span> <span class="text-white">+3分</span></div>
-                    <div><span class="badge-primary">🛡️ 防重奖励</span> <span class="text-white">+1分</span></div>
+                    <div class="score-item"><span class="badge-primary">🎯 和值精确</span> <span class="text-white">+5分</span></div>
+                    <div class="score-item"><span class="badge-primary">📊 和值接近</span> <span class="text-white">+2分</span></div>
+                    <div class="score-item"><span class="badge-primary">✨ 奇偶匹配</span> <span class="text-white">+4分</span></div>
+                    <div class="score-item"><span class="badge-primary">📏 大小匹配</span> <span class="text-white">+4分</span></div>
+                    <div class="score-item"><span class="badge-primary">🔮 形态匹配</span> <span class="text-white">+3分</span></div>
+                    <div class="score-item"><span class="badge-primary">📍 位置合理性</span> <span class="text-white">+3分</span></div>
+                    <div class="score-item"><span class="badge-primary">🛡️ 防重奖励</span> <span class="text-white">+1分</span></div>
                 </div>
             </div>
         </div>
@@ -715,5 +835,29 @@
             彩票开奖是独立随机事件，任何号码中奖概率相同
         </div>
     </div>
+
+    <script>
+        // 加载动画
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(function() {
+                    document.getElementById('loader').style.display = 'none';
+                    document.body.classList.add('loaded');
+                }, 500);
+            }, 300);
+        });
+
+        // 卡片点击震动反馈（移动端）
+        const cards = document.querySelectorAll('.prediction-item, .stat-card, .history-card, .candidate-item');
+        cards.forEach(card => {
+            card.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            card.addEventListener('touchend', function() {
+                this.style.transform = '';
+            });
+        });
+    </script>
 </body>
 </html>
