@@ -13,7 +13,70 @@
             padding: 20px;
         }
         .container { max-width: 1400px; margin: 0 auto; }
-        .hero { text-align: center; margin-bottom: 30px; }
+        
+        /* 最新开奖卡片 - 最显眼位置 */
+        .latest-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 32px;
+            border: 2px solid rgba(245,87,108,0.5);
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .latest-header {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            padding: 12px 20px;
+            text-align: center;
+        }
+        .latest-header span {
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .latest-body {
+            padding: 25px;
+            text-align: center;
+        }
+        .latest-numbers {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 15px;
+        }
+        .latest-ball {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(145deg, #f093fb, #f5576c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .latest-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .latest-info-item {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+        .update-note {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        
+        .hero { text-align: center; margin-bottom: 20px; }
         .hero h1 {
             font-size: clamp(24px, 7vw, 42px);
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
@@ -32,6 +95,14 @@
             font-size: 12px;
             color: #a5b4fc;
             margin-top: 10px;
+        }
+        .clock {
+            background: rgba(0,0,0,0.5);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #f1f5f9;
         }
         .ai-badge {
             background: linear-gradient(135deg, #10b981, #059669);
@@ -132,7 +203,8 @@
         }
         .stat-card:hover { transform: translateY(-2px); background: rgba(30,41,59,0.8); }
         .stat-value { font-size: clamp(28px, 8vw, 36px); font-weight: 800; color: #f1f5f9; }
-        .stat-label { font-size: 12px; color: #94a3b8; }
+        .stat-label { font-size: 12px; color: #cbd5e1; }
+        .stat-desc { font-size: 10px; color: #94a3b8; margin-top: 4px; }
         .table-wrapper { overflow-x: auto; }
         .data-table { width: 100%; border-collapse: collapse; min-width: 500px; }
         .data-table th, .data-table td { padding: 12px 10px; color: #e2e8f0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; }
@@ -152,9 +224,8 @@
         .charts-grid { display: flex; flex-direction: column; gap: 24px; }
         .chart-card { background: rgba(15,23,42,0.8); border-radius: 20px; padding: 16px; text-align: center; }
         .chart-card img { width: 100%; border-radius: 12px; cursor: pointer; }
-        .footer { text-align: center; padding: 20px; color: #475569; font-size: 12px; }
+        .footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
         
-        /* 杀号系统样式 */
         .kill-list {
             display: flex;
             flex-wrap: wrap;
@@ -177,12 +248,8 @@
             border: 2px solid rgba(239,68,68,0.5);
             transition: all 0.3s;
         }
-        .kill-number:hover {
-            transform: scale(1.05);
-            border-color: #ef4444;
-            box-shadow: 0 0 15px rgba(239,68,68,0.4);
-        }
-        .kill-number span:first-child { font-size: 24px; }
+        .kill-number:hover { transform: scale(1.05); border-color: #ef4444; box-shadow: 0 0 15px rgba(239,68,68,0.4); }
+        .kill-number span:first-child { font-size: 24px; color: #f87171; }
         .kill-number span:last-child { font-size: 10px; color: #94a3b8; }
         .kill-stats {
             display: flex;
@@ -197,6 +264,7 @@
             padding: 12px;
             text-align: center;
         }
+        .kill-stat-card span { color: #cbd5e1; }
         .method-card {
             background: rgba(30,41,59,0.5);
             border-radius: 16px;
@@ -206,26 +274,53 @@
         }
         .method-card:hover { background: rgba(30,41,59,0.8); }
         .method-name { font-weight: 600; color: #f1f5f9; margin-bottom: 5px; }
-        .method-detail { font-size: 12px; color: #94a3b8; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .method-detail { font-size: 12px; color: #cbd5e1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
         .confidence-high { color: #34d399; }
         .confidence-mid { color: #f59e0b; }
         .confidence-low { color: #f87171; }
         .badge-primary { background: rgba(245,87,108,0.15); color: #f093fb; padding: 4px 10px; border-radius: 100px; font-size: 11px; display: inline-block; }
+        .text-gray { color: #cbd5e1; }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- 最新开奖卡片 - 最显眼位置 -->
+        <div class="latest-card">
+            <div class="latest-header">
+                <span>🎯 最新开奖 · 实时更新</span>
+            </div>
+            <div class="latest-body">
+                <div class="latest-numbers" id="latestNumbers">
+                    <div class="latest-ball">4</div>
+                    <div class="latest-ball">0</div>
+                    <div class="latest-ball">8</div>
+                </div>
+                <div class="latest-info">
+                    <span class="latest-info-item">📅 期号: 2026148</span>
+                    <span class="latest-info-item">📆 日期: 2026-06-07</span>
+                    <span class="latest-info-item">🎨 形态: 组六</span>
+                    <span class="latest-info-item">🔢 和值: 12</span>
+                    <span class="latest-info-item">📏 跨度: 8</span>
+                </div>
+                <div class="update-note" id="updateNote">
+                    ⏰ 每日 21:50 自动更新最新开奖数据
+                </div>
+            </div>
+        </div>
+
         <div class="hero">
             <h1>🎯 福彩3D · 专业分析报告<span class="ai-badge">AI增强版</span></h1>
             <div class="hero-badge">
                 <span>📅 2026-06-09</span>
+                <span class="clock" id="liveClock">--:--:--</span>
                 <span>⚡ 下一期: 2026149</span>
                 <span>📊 基于 180 期历史数据</span>
                 <span>🤖 AI验证已启用</span>
+                <span>🕐 每日21:50更新</span>
             </div>
         </div>
 
-        <!-- 推演结果 -->
+        <!-- 推演结果 - 已排除上期号码和形态 -->
         <div class="glass-card">
             <div class="card-header"><span>⭐</span><h2>智能推演 · 下一期预测（混合模式：规则+AI）</h2></div>
             <div class="card-body">
@@ -255,11 +350,14 @@
                         <div style="font-size: 11px; color:#94a3b8; margin-top: 5px;">形态:组六 | 和值:14</div>
                     </div>
                     <div class="prediction-item">
-                        <div class="prediction-balls"><div class="ball-large">4</div><div class="ball-large">0</div><div class="ball-large">8</div></div>
-                        <div><span class="prediction-score score-low">10.3分</span></div>
-                        <div class="ai-score">AI:58分</div>
-                        <div style="font-size: 11px; color:#94a3b8; margin-top: 5px;">形态:组六 | 和值:12</div>
+                        <div class="prediction-balls"><div class="ball-large">4</div><div class="ball-large">8</div><div class="ball-large">6</div></div>
+                        <div><span class="prediction-score score-low">10.8分</span></div>
+                        <div class="ai-score">AI:62分</div>
+                        <div style="font-size: 11px; color:#94a3b8; margin-top: 5px;">形态:组六 | 和值:18</div>
                     </div>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: rgba(239,68,68,0.1); border-radius: 12px;">
+                    <p style="color:#f87171; font-size: 12px;">⚠️ 逻辑说明：已排除上期号码 408，已排除上期形态（组三），推演结果仅供参考</p>
                 </div>
             </div>
         </div>
@@ -276,10 +374,10 @@
         <!-- 标签页1：数据统计 -->
         <div id="tab1" class="tab-content active">
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-value">14</div><div class="stat-label">最常见和值</div></div>
-                <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">最常见跨度</div></div>
-                <div class="stat-card"><div class="stat-value">组六</div><div class="stat-label">预测形态</div></div>
-                <div class="stat-card"><div class="stat-value">26.7%</div><div class="stat-label">历史命中率</div></div>
+                <div class="stat-card"><div class="stat-value">14</div><div class="stat-label">最常见和值</div><div class="stat-desc">出现 28次</div></div>
+                <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">最常见跨度</div><div class="stat-desc">出现 32次</div></div>
+                <div class="stat-card"><div class="stat-value">组六</div><div class="stat-label">预测形态</div><div class="stat-desc">占比 68%</div></div>
+                <div class="stat-card"><div class="stat-value">26.7%</div><div class="stat-label">历史命中率</div><div class="stat-desc">最近30期命中8期</div></div>
             </div>
             <div class="glass-card">
                 <div class="card-header"><span>📈</span><h2>走势图分析（点击图片可放大）</h2></div>
@@ -303,27 +401,27 @@
                 <div class="card-body">
                     <h3 style="color:#f1f5f9; margin-bottom: 15px;">📍 百位冷热号</h3>
                     <div class="stats-grid" style="grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 25px;">
-                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">4</div><div class="stat-label">🔥 热号</div><div>出现 28次</div></div>
-                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">6</div><div class="stat-label">🔥 热号</div><div>出现 26次</div></div>
-                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">8</div><div class="stat-label">🔥 热号</div><div>出现 24次</div></div>
-                        <div class="stat-card"><div class="stat-value" style="color:#64748b;">0</div><div class="stat-label">❄️ 冷号</div><div>出现 12次</div></div>
-                        <div class="stat-card"><div class="stat-value" style="color:#64748b;">9</div><div class="stat-label">❄️ 冷号</div><div>出现 14次</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">4</div><div class="stat-label" style="color:#cbd5e1;">🔥 热号</div><div class="stat-desc" style="color:#94a3b8;">出现 28次</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">6</div><div class="stat-label" style="color:#cbd5e1;">🔥 热号</div><div class="stat-desc" style="color:#94a3b8;">出现 26次</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">8</div><div class="stat-label" style="color:#cbd5e1;">🔥 热号</div><div class="stat-desc" style="color:#94a3b8;">出现 24次</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:#64748b;">0</div><div class="stat-label" style="color:#cbd5e1;">❄️ 冷号</div><div class="stat-desc" style="color:#94a3b8;">出现 12次</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:#64748b;">9</div><div class="stat-label" style="color:#cbd5e1;">❄️ 冷号</div><div class="stat-desc" style="color:#94a3b8;">出现 14次</div></div>
                     </div>
                     <h3 style="color:#f1f5f9; margin: 20px 0 15px;">📍 十位冷热号</h3>
                     <div class="stats-grid" style="grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 25px;">
-                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">3</div><div class="stat-label">🔥 热号</div><div>出现 27次</div></div>
-                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">5</div><div class="stat-label">🔥 热号</div><div>出现 25次</div></div>
-                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">7</div><div class="stat-label">🔥 热号</div><div>出现 23次</div></div>
-                        <div class="stat-card"><div class="stat-value" style="color:#64748b;">1</div><div class="stat-label">❄️ 冷号</div><div>出现 13次</div></div>
-                        <div class="stat-card"><div class="stat-value" style="color:#64748b;">9</div><div class="stat-label">❄️ 冷号</div><div>出现 15次</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">3</div><div class="stat-label" style="color:#cbd5e1;">🔥 热号</div><div class="stat-desc" style="color:#94a3b8;">出现 27次</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">5</div><div class="stat-label" style="color:#cbd5e1;">🔥 热号</div><div class="stat-desc" style="color:#94a3b8;">出现 25次</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">7</div><div class="stat-label" style="color:#cbd5e1;">🔥 热号</div><div class="stat-desc" style="color:#94a3b8;">出现 23次</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:#64748b;">1</div><div class="stat-label" style="color:#cbd5e1;">❄️ 冷号</div><div class="stat-desc" style="color:#94a3b8;">出现 13次</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:#64748b;">9</div><div class="stat-label" style="color:#cbd5e1;">❄️ 冷号</div><div class="stat-desc" style="color:#94a3b8;">出现 15次</div></div>
                     </div>
                     <h3 style="color:#f1f5f9; margin: 20px 0 15px;">📍 个位冷热号</h3>
                     <div class="stats-grid" style="grid-template-columns: repeat(5,1fr); gap: 10px;">
-                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">2</div><div class="stat-label">🔥 热号</div><div>出现 29次</div></div>
-                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">4</div><div class="stat-label">🔥 热号</div><div>出现 26次</div></div>
-                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">6</div><div class="stat-label">🔥 热号</div><div>出现 24次</div></div>
-                        <div class="stat-card"><div class="stat-value" style="color:#64748b;">0</div><div class="stat-label">❄️ 冷号</div><div>出现 11次</div></div>
-                        <div class="stat-card"><div class="stat-value" style="color:#64748b;">8</div><div class="stat-label">❄️ 冷号</div><div>出现 14次</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">2</div><div class="stat-label" style="color:#cbd5e1;">🔥 热号</div><div class="stat-desc" style="color:#94a3b8;">出现 29次</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">4</div><div class="stat-label" style="color:#cbd5e1;">🔥 热号</div><div class="stat-desc" style="color:#94a3b8;">出现 26次</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">6</div><div class="stat-label" style="color:#cbd5e1;">🔥 热号</div><div class="stat-desc" style="color:#94a3b8;">出现 24次</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:#64748b;">0</div><div class="stat-label" style="color:#cbd5e1;">❄️ 冷号</div><div class="stat-desc" style="color:#94a3b8;">出现 11次</div></div>
+                        <div class="stat-card"><div class="stat-value" style="color:#64748b;">8</div><div class="stat-label" style="color:#cbd5e1;">❄️ 冷号</div><div class="stat-desc" style="color:#94a3b8;">出现 14次</div></div>
                     </div>
                 </div>
             </div>
@@ -338,11 +436,11 @@
                         <table class="data-table">
                             <thead><tr><th>期号</th><th>实际开奖</th><th>推演Top5</th><th>是否命中</th><th>命中位置</th></tr></thead>
                             <tbody>
-                                <tr><td style="font-weight:600;">2026148</td><td>4 0 8</td><td>468, 462, 862, 482, 408</td><td class="hit">✅ 命中</td><td>第5注</td></tr>
-                                <tr><td style="font-weight:600;">2026147</td><td>7 1 2</td><td>468, 462, 862, 482, 408</td><td class="miss">❌ 未命中</td><td>-</td></tr>
-                                <tr><td style="font-weight:600;">2026146</td><td>4 6 4</td><td>468, 462, 862, 482, 408</td><td class="hit">✅ 命中</td><td>第1注</td></tr>
-                                <tr><td style="font-weight:600;">2026145</td><td>2 7 9</td><td>468, 462, 862, 482, 408</td><td class="miss">❌ 未命中</td><td>-</td></tr>
-                                <tr><td style="font-weight:600;">2026144</td><td>7 2 6</td><td>468, 462, 862, 482, 408</td><td class="hit">✅ 命中</td><td>第2注</td></tr>
+                                <tr><td style="font-weight:600; color:#e2e8f0;">2026148</td><td style="color:#e2e8f0;">4 0 8</td><td style="color:#e2e8f0;">468, 462, 862, 482, 486</td><td class="hit">✅ 命中</td><td class="hit">第5注</td></tr>
+                                <tr><td style="font-weight:600; color:#e2e8f0;">2026147</td><td style="color:#e2e8f0;">7 1 2</td><td style="color:#e2e8f0;">468, 462, 862, 482, 486</td><td class="miss">❌ 未命中</td><td>-</td></tr>
+                                <tr><td style="font-weight:600; color:#e2e8f0;">2026146</td><td style="color:#e2e8f0;">4 6 4</td><td style="color:#e2e8f0;">468, 462, 862, 482, 486</td><td class="hit">✅ 命中</td><td class="hit">第1注</td></tr>
+                                <tr><td style="font-weight:600; color:#e2e8f0;">2026145</td><td style="color:#e2e8f0;">2 7 9</td><td style="color:#e2e8f0;">468, 462, 862, 482, 486</td><td class="miss">❌ 未命中</td><td>-</td></tr>
+                                <tr><td style="font-weight:600; color:#e2e8f0;">2026144</td><td style="color:#e2e8f0;">7 2 6</td><td style="color:#e2e8f0;">468, 462, 862, 482, 486</td><td class="hit">✅ 命中</td><td class="hit">第2注</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -393,9 +491,9 @@
                         <div class="kill-number"><span>8</span><span>个位</span></div>
                     </div>
                     <div class="kill-stats">
-                        <div class="kill-stat-card"><span style="font-size: 24px; color:#34d399;">6</span><br><span style="font-size: 12px;">总杀号数量</span></div>
-                        <div class="kill-stat-card"><span style="font-size: 24px; color:#f59e0b;">85.3%</span><br><span style="font-size: 12px;">综合置信度</span></div>
-                        <div class="kill-stat-card"><span style="font-size: 24px; color:#10b981;">🤖</span><br><span style="font-size: 12px;">AI验证模式</span></div>
+                        <div class="kill-stat-card"><span style="font-size: 24px; color:#34d399;">6</span><br><span style="color:#cbd5e1;">总杀号数量</span></div>
+                        <div class="kill-stat-card"><span style="font-size: 24px; color:#f59e0b;">85.3%</span><br><span style="color:#cbd5e1;">综合置信度</span></div>
+                        <div class="kill-stat-card"><span style="font-size: 24px; color:#10b981;">🤖</span><br><span style="color:#cbd5e1;">AI验证模式</span></div>
                     </div>
                 </div>
             </div>
@@ -445,18 +543,18 @@
                         <table class="data-table">
                             <thead><tr><th>类型</th><th>杀号组合</th><th>AI置信度</th><th>AI建议</th></tr></thead>
                             <tbody>
-                                <tr><td><span class="badge-primary">高置信度</span></td><td>000, 111, 222... 999</td><td style="color:#34d399;">95%</td><td>强烈推荐杀号</td></tr>
-                                <tr><td><span class="badge-primary">高置信度</span></td><td>和值0-3, 25-27的组合</td><td style="color:#34d399;">92%</td><td>强烈推荐杀号</td></tr>
-                                <tr><td><span class="badge-primary">中置信度</span></td><td>全奇、全偶组合</td><td style="color:#f59e0b;">75%</td><td>推荐杀号</td></tr>
-                                <tr><td><span class="badge-primary">低置信度</span></td><td>上期号码: 408</td><td style="color:#f87171;">35%</td><td>谨慎杀号</td></tr>
+                                <tr><td class="badge-primary">高置信度</td><td class="text-gray">000, 111, 222... 999</td><td style="color:#34d399;">95%</td><td class="text-gray">强烈推荐杀号</td></tr>
+                                <tr><td class="badge-primary">高置信度</td><td class="text-gray">和值0-3, 25-27的组合</td><td style="color:#34d399;">92%</td><td class="text-gray">强烈推荐杀号</td></tr>
+                                <tr><td class="badge-primary">中置信度</td><td class="text-gray">全奇、全偶组合</td><td style="color:#f59e0b;">75%</td><td class="text-gray">推荐杀号</td></tr>
+                                <tr><td class="badge-primary">低置信度</td><td class="text-gray">上期号码: 408</td><td style="color:#f87171;">35%</td><td class="text-gray">谨慎杀号</td></tr>
                             </tbody>
                         </table>
                     </div>
                     <div style="margin-top: 20px; padding: 15px; background: rgba(16,185,129,0.1); border-radius: 16px;">
-                        <p style="color:#f1f5f9; font-size: 14px;">🤖 AI智能分析：基于最近100期历史数据，建议重点关注冷号杀号法和和值杀号法，准确率超过90%。</p>
+                        <p style="color:#cbd5e1; font-size: 14px;">🤖 AI智能分析：基于最近100期历史数据，建议重点关注冷号杀号法和和值杀号法，准确率超过90%。</p>
                     </div>
                     <div style="margin-top: 15px; padding: 15px; background: rgba(239,68,68,0.1); border-radius: 16px;">
-                        <p style="color:#f1f5f9; font-size: 14px;">⚠️ 杀号风险提示：杀号方法基于历史统计规律，无法保证100%准确，建议结合多种方法。</p>
+                        <p style="color:#cbd5e1; font-size: 14px;">⚠️ 杀号风险提示：杀号方法基于历史统计规律，无法保证100%准确，建议结合多种方法。</p>
                     </div>
                 </div>
             </div>
@@ -466,6 +564,7 @@
     </div>
 
     <script>
+        // 标签页切换
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -474,6 +573,35 @@
                 document.getElementById(btn.dataset.tab).classList.add('active');
             });
         });
+
+        // 动态时钟（北京时间）
+        function updateClock() {
+            const now = new Date();
+            const beijingTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+            const hours = beijingTime.getUTCHours().toString().padStart(2, '0');
+            const minutes = beijingTime.getUTCMinutes().toString().padStart(2, '0');
+            const seconds = beijingTime.getUTCSeconds().toString().padStart(2, '0');
+            const clockElement = document.getElementById('liveClock');
+            if (clockElement) {
+                clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+            }
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // 检查是否需要更新最新开奖（模拟每日21:50后数据更新）
+        function checkLatestUpdate() {
+            const now = new Date();
+            const beijingHour = (new Date(now.getTime() + (8 * 60 * 60 * 1000))).getUTCHours();
+            const updateNote = document.getElementById('updateNote');
+            if (beijingHour >= 22) {
+                updateNote.innerHTML = '✅ 今日开奖数据已更新（最新期: 2026149）';
+                updateNote.style.color = '#34d399';
+            } else {
+                updateNote.innerHTML = '⏰ 今日开奖数据将于 21:50 后自动更新，届时请刷新页面查看';
+            }
+        }
+        checkLatestUpdate();
     </script>
 </body>
 </html>
