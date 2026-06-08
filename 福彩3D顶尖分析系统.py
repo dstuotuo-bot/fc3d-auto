@@ -35,16 +35,17 @@ def load_data():
     print("\n【数据获取】")
     
     if not os.path.exists(file_path):
-        print("  ❌ 未找到数据文件，请先手动运行一次生成初始数据")
+        print("  ❌ 未找到数据文件")
         return None
     
     df = pd.read_excel(file_path, dtype={'开奖号码': str})
     print(f"  📁 使用本地数据文件，共 {len(df)} 期")
+    
+    df = df.sort_values('期号').reset_index(drop=True)
     print(f"  📁 最新期号: {df.iloc[-1]['期号']}")
     
     df['开奖号码'] = df['开奖号码'].str.replace(' ', '')
     df['开奖日期'] = pd.to_datetime(df['开奖日期'])
-    df = df.sort_values('开奖日期').reset_index(drop=True)
     
     df['百位'] = df['开奖号码'].str[0].astype(int)
     df['十位'] = df['开奖号码'].str[1].astype(int)
