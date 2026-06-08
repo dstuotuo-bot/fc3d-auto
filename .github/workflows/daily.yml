@@ -2,7 +2,7 @@ name: 福彩3D自动分析
 
 on:
   schedule:
-    - cron: '0 10 * * *'
+    - cron: '50 13 * * *'  # UTC 13:50 = 北京时间 21:50
   workflow_dispatch:
 
 permissions:
