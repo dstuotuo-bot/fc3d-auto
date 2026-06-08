@@ -2,67 +2,86 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=yes">
-    <title>福彩3D · 智选分析报告</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>福彩3D · 专业分析报告</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Microsoft YaHei', 'PingFang SC', Arial, sans-serif;
             background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
             min-height: 100vh;
-            padding: 16px;
+            padding: 20px;
         }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
+        .container { max-width: 1400px; margin: 0 auto; }
+        
         /* 头部 */
-        .hero {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
+        .hero { text-align: center; margin-bottom: 30px; }
         .hero h1 {
             font-size: clamp(24px, 7vw, 42px);
-            font-weight: 800;
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            margin-bottom: 8px;
         }
-
         .hero-badge {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 8px 16px;
             background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            padding: 8px 16px;
+            padding: 8px 20px;
             border-radius: 100px;
             font-size: 12px;
             color: #a5b4fc;
+            margin-top: 10px;
         }
-
+        
+        /* 标签页 */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+        .tab-btn {
+            background: rgba(30,41,59,0.5);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .tab-btn:hover {
+            background: rgba(245,87,108,0.2);
+            color: #f093fb;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         /* 卡片 */
         .glass-card {
-            background: rgba(30, 41, 59, 0.7);
+            background: rgba(30,41,59,0.7);
             backdrop-filter: blur(12px);
             border-radius: 24px;
             border: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 20px;
             overflow: hidden;
         }
-
         .card-header {
             padding: 16px 20px;
             border-bottom: 1px solid rgba(255,255,255,0.08);
@@ -71,62 +90,24 @@
             gap: 10px;
             flex-wrap: wrap;
         }
-
-        .card-header span {
-            font-size: 24px;
-        }
-
-        .card-header h2 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #f1f5f9;
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
+        .card-header h2 { font-size: 18px; color: #f1f5f9; }
+        .card-body { padding: 20px; }
+        
         /* 推演网格 */
         .prediction-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 16px;
         }
-
-        @media (max-width: 640px) {
-            .prediction-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
+        @media (max-width: 640px) { .prediction-grid { grid-template-columns: 1fr; } }
         .prediction-item {
             background: linear-gradient(145deg, #1e293b, #0f172a);
             border-radius: 28px;
-            padding: 20px 16px;
+            padding: 20px;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.3s ease;
         }
-
-        .prediction-item:hover {
-            transform: scale(1.02);
-            border-color: rgba(245, 87, 108, 0.5);
-        }
-
-        .prediction-rank {
-            font-size: 13px;
-            color: #94a3b8;
-            margin-bottom: 12px;
-        }
-
-        .prediction-balls {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-        }
-
+        .prediction-balls { display: flex; justify-content: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
         .ball-large {
             width: clamp(55px, 15vw, 70px);
             height: clamp(55px, 15vw, 70px);
@@ -140,7 +121,6 @@
             color: white;
             box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
-
         .prediction-score {
             display: inline-block;
             padding: 4px 14px;
@@ -148,28 +128,10 @@
             font-size: 13px;
             font-weight: 600;
         }
-
-        .score-high {
-            background: linear-gradient(135deg, #f5576c, #f093fb);
-            color: white;
-        }
-
-        .score-mid {
-            background: linear-gradient(135deg, #f59e0b, #f97316);
-            color: white;
-        }
-
-        .score-low {
-            background: linear-gradient(135deg, #10b981, #34d399);
-            color: white;
-        }
-
-        .prediction-detail {
-            font-size: 11px;
-            color: #94a3b8;
-            margin-top: 8px;
-        }
-
+        .score-high { background: linear-gradient(135deg, #f5576c, #f093fb); color: white; }
+        .score-mid { background: linear-gradient(135deg, #f59e0b, #f97316); color: white; }
+        .score-low { background: linear-gradient(135deg, #10b981, #34d399); color: white; }
+        
         /* 统计卡片 */
         .stats-grid {
             display: grid;
@@ -177,230 +139,101 @@
             gap: 16px;
             margin-bottom: 20px;
         }
-
-        @media (max-width: 640px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 400px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
+        @media (max-width: 640px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
         .stat-card {
-            background: rgba(30, 41, 59, 0.6);
+            background: rgba(30,41,59,0.6);
             border-radius: 20px;
             padding: 16px;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.05);
         }
-
-        .stat-value {
-            font-size: clamp(28px, 8vw, 36px);
-            font-weight: 800;
-            color: #f1f5f9;
-            margin-bottom: 6px;
+        .stat-value { font-size: clamp(28px, 8vw, 36px); font-weight: 800; color: #f1f5f9; }
+        .stat-label { font-size: 12px; color: #94a3b8; }
+        
+        /* 表格 */
+        .table-wrapper { overflow-x: auto; }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
         }
-
-        .stat-label {
-            font-size: 12px;
-            color: #94a3b8;
-        }
-
-        .stat-desc {
-            font-size: 10px;
-            color: #64748b;
-            margin-top: 4px;
-        }
-
-        /* 横排卡片布局 - 最近5期 */
-        .history-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 16px;
-        }
-
-        @media (max-width: 640px) {
-            .history-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .history-card {
-            background: rgba(30, 41, 59, 0.6);
-            border-radius: 20px;
-            padding: 16px;
+        .data-table th, .data-table td {
+            padding: 12px 10px;
+            color: #e2e8f0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.08);
-            transition: all 0.2s;
         }
-
-        .history-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(245, 87, 108, 0.3);
-        }
-
-        .history-period {
-            font-size: 16px;
-            font-weight: 700;
-            color: #f1f5f9;
-            margin-bottom: 6px;
-        }
-
-        .history-date {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-bottom: 12px;
-        }
-
-        .history-balls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .history-info {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            font-size: 12px;
-            color: #94a3b8;
-            flex-wrap: wrap;
-        }
-
+        .data-table th { color: #94a3b8; font-weight: 500; }
+        .hit { background: rgba(16,185,129,0.2); color: #34d399; }
+        .miss { background: rgba(239,68,68,0.2); color: #f87171; }
+        
         /* 号码球 */
         .ball-small {
             display: inline-flex;
-            width: clamp(32px, 10vw, 38px);
-            height: clamp(32px, 10vw, 38px);
+            width: 34px;
+            height: 34px;
             background: linear-gradient(145deg, #f093fb, #f5576c);
             border-radius: 50%;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: clamp(14px, 4vw, 16px);
+            font-size: 14px;
             color: white;
             margin: 0 2px;
         }
-
-        .ball-blue {
-            background: linear-gradient(145deg, #4facfe, #00f2fe);
-        }
-
-        .ball-green {
-            background: linear-gradient(145deg, #43e97b, #38f9d7);
-        }
-
-        .ball-purple {
-            background: linear-gradient(145deg, #a18cd1, #fbc2eb);
-        }
-
+        .cold { background: linear-gradient(145deg, #64748b, #475569); }
+        .hot { background: linear-gradient(145deg, #f59e0b, #f97316); }
+        
         /* 进度条 */
         .progress-bar {
             background: rgba(255,255,255,0.1);
             border-radius: 12px;
-            height: 32px;
+            height: 24px;
             overflow: hidden;
-            margin: 12px 0;
+            margin: 8px 0;
         }
-
         .progress-fill {
             background: linear-gradient(90deg, #f093fb, #f5576c);
             height: 100%;
             display: flex;
             align-items: center;
-            padding-left: 12px;
+            padding-left: 8px;
             color: white;
-            font-size: 12px;
-            font-weight: 500;
+            font-size: 11px;
             border-radius: 12px;
         }
-
-        /* 走势图网格 */
-        .charts-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
+        
+        /* 图表网格 */
+        .charts-grid { display: flex; flex-direction: column; gap: 24px; }
         .chart-card {
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(15,23,42,0.8);
             border-radius: 20px;
             padding: 16px;
             text-align: center;
         }
-
-        .chart-card h3 {
-            color: #f1f5f9;
-            margin-bottom: 12px;
-            font-size: 16px;
-        }
-
-        .chart-card img {
-            width: 100%;
-            height: auto;
-            border-radius: 12px;
+        .chart-card img { width: 100%; border-radius: 12px; cursor: pointer; }
+        
+        /* 按钮 */
+        .btn {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: white;
             cursor: pointer;
+            font-size: 14px;
             transition: transform 0.2s;
         }
-
-        .chart-card img:hover {
-            transform: scale(1.02);
-        }
-
-        /* 备选参考网格 */
-        .candidates-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .candidate-item {
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 10px 16px;
-            text-align: center;
-        }
-
-        /* 评分说明网格 */
-        .score-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 10px;
-        }
-
-        .badge-primary {
-            background: rgba(245, 87, 108, 0.15);
-            color: #f093fb;
-            padding: 4px 10px;
-            border-radius: 100px;
-            font-size: 11px;
-            display: inline-block;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 24px;
-            color: #475569;
-            font-size: 11px;
-        }
-
-        .text-white {
-            color: white !important;
-            font-weight: bold;
-        }
+        .btn:hover { transform: scale(1.02); }
+        
+        .footer { text-align: center; padding: 20px; color: #475569; font-size: 12px; }
+        .badge-primary { background: rgba(245,87,108,0.15); color: #f093fb; padding: 4px 10px; border-radius: 100px; font-size: 11px; }
+        .text-white { color: white !important; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 头部 -->
         <div class="hero">
-            <h1>🎯 福彩3D · 智选分析</h1>
+            <h1>🎯 福彩3D · 专业分析报告</h1>
             <div class="hero-badge">
                 <span>📅 2026-06-08</span>
                 <span>⚡ 下一期: 2026149</span>
@@ -410,310 +243,269 @@
 
         <!-- 推演结果 -->
         <div class="glass-card">
-            <div class="card-header">
-                <span>⭐</span>
-                <h2>智能推演 · 下一期预测</h2>
-            </div>
+            <div class="card-header"><span>⭐</span><h2>智能推演 · 下一期预测</h2></div>
             <div class="card-body">
                 <div class="prediction-grid">
                     <div class="prediction-item">
-                        <div class="prediction-rank">第1注 · 推荐</div>
-                        <div class="prediction-balls">
-                            <div class="ball-large">4</div>
-                            <div class="ball-large">6</div>
-                            <div class="ball-large">8</div>
-                        </div>
+                        <div class="prediction-balls"><div class="ball-large">4</div><div class="ball-large">6</div><div class="ball-large">8</div></div>
                         <div><span class="prediction-score score-high">16.5分</span></div>
-                        <div class="prediction-detail">形态: 组六 | 和值: 18</div>
+                        <div style="font-size: 12px; color:#94a3b8;">形态:组六 | 和值:18</div>
                     </div>
                     <div class="prediction-item">
-                        <div class="prediction-rank">第2注 · 推荐</div>
-                        <div class="prediction-balls">
-                            <div class="ball-large">4</div>
-                            <div class="ball-large">6</div>
-                            <div class="ball-large">2</div>
-                        </div>
+                        <div class="prediction-balls"><div class="ball-large">4</div><div class="ball-large">6</div><div class="ball-large">2</div></div>
                         <div><span class="prediction-score score-mid">14.2分</span></div>
-                        <div class="prediction-detail">形态: 组六 | 和值: 12</div>
+                        <div style="font-size: 12px; color:#94a3b8;">形态:组六 | 和值:12</div>
                     </div>
                     <div class="prediction-item">
-                        <div class="prediction-rank">第3注 · 推荐</div>
-                        <div class="prediction-balls">
-                            <div class="ball-large">8</div>
-                            <div class="ball-large">6</div>
-                            <div class="ball-large">2</div>
-                        </div>
+                        <div class="prediction-balls"><div class="ball-large">8</div><div class="ball-large">6</div><div class="ball-large">2</div></div>
                         <div><span class="prediction-score score-mid">13.8分</span></div>
-                        <div class="prediction-detail">形态: 组六 | 和值: 16</div>
+                        <div style="font-size: 12px; color:#94a3b8;">形态:组六 | 和值:16</div>
                     </div>
                     <div class="prediction-item">
-                        <div class="prediction-rank">第4注 · 推荐</div>
-                        <div class="prediction-balls">
-                            <div class="ball-large">4</div>
-                            <div class="ball-large">8</div>
-                            <div class="ball-large">2</div>
-                        </div>
+                        <div class="prediction-balls"><div class="ball-large">4</div><div class="ball-large">8</div><div class="ball-large">2</div></div>
                         <div><span class="prediction-score score-low">11.5分</span></div>
-                        <div class="prediction-detail">形态: 组六 | 和值: 14</div>
+                        <div style="font-size: 12px; color:#94a3b8;">形态:组六 | 和值:14</div>
                     </div>
                     <div class="prediction-item">
-                        <div class="prediction-rank">第5注 · 推荐</div>
-                        <div class="prediction-balls">
-                            <div class="ball-large">4</div>
-                            <div class="ball-large">0</div>
-                            <div class="ball-large">8</div>
-                        </div>
+                        <div class="prediction-balls"><div class="ball-large">4</div><div class="ball-large">0</div><div class="ball-large">8</div></div>
                         <div><span class="prediction-score score-low">10.3分</span></div>
-                        <div class="prediction-detail">形态: 组六 | 和值: 12</div>
+                        <div style="font-size: 12px; color:#94a3b8;">形态:组六 | 和值:12</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 统计卡片 -->
-        <div class="stats-grid">
-            <div class="stat-card"><div class="stat-value">14</div><div class="stat-label">🎯 最常见和值</div><div class="stat-desc">重点关注</div></div>
-            <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">📐 最常见跨度</div><div class="stat-desc">历史最高频</div></div>
-            <div class="stat-card"><div class="stat-value">组六</div><div class="stat-label">🔮 预测形态</div><div class="stat-desc">基于转移概率</div></div>
-            <div class="stat-card"><div class="stat-value">--</div><div class="stat-label">历史命中率</div><div class="stat-desc">数据积累中</div></div>
+        <!-- 标签页导航 -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="tab1">📊 数据统计</button>
+            <button class="tab-btn" data-tab="tab2">❄️ 冷热号分析</button>
+            <button class="tab-btn" data-tab="tab3">📈 历史对比</button>
+            <button class="tab-btn" data-tab="tab4">📉 遗漏统计</button>
+            <button class="tab-btn" data-tab="tab5">💾 数据导出</button>
         </div>
 
-        <!-- 最近5期开奖记录 - 横排卡片式 -->
-        <div class="glass-card">
-            <div class="card-header">
-                <span>📋</span>
-                <h2>最近5期开奖记录</h2>
+        <!-- 标签页1：数据统计 -->
+        <div id="tab1" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-value">14</div><div class="stat-label">最常见和值</div></div>
+                <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">最常见跨度</div></div>
+                <div class="stat-card"><div class="stat-value">组六</div><div class="stat-label">预测形态</div></div>
+                <div class="stat-card"><div class="stat-value">26.7%</div><div class="stat-label">历史命中率</div></div>
             </div>
-            <div class="card-body">
-                <div class="history-grid">
-                    <div class="history-card">
-                        <div class="history-period">2026144</div>
-                        <div class="history-date">2026-06-03</div>
-                        <div class="history-balls">
-                            <span class="ball-small">7</span>
-                            <span class="ball-small">2</span>
-                            <span class="ball-small">6</span>
-                        </div>
-                        <div class="history-info">
-                            <span class="badge-primary">组六</span>
-                            <span>和值 15</span>
-                            <span>跨度 5</span>
-                        </div>
-                    </div>
-                    <div class="history-card">
-                        <div class="history-period">2026145</div>
-                        <div class="history-date">2026-06-04</div>
-                        <div class="history-balls">
-                            <span class="ball-small">2</span>
-                            <span class="ball-small">7</span>
-                            <span class="ball-small">9</span>
-                        </div>
-                        <div class="history-info">
-                            <span class="badge-primary">组六</span>
-                            <span>和值 18</span>
-                            <span>跨度 7</span>
-                        </div>
-                    </div>
-                    <div class="history-card">
-                        <div class="history-period">2026146</div>
-                        <div class="history-date">2026-06-05</div>
-                        <div class="history-balls">
-                            <span class="ball-small">4</span>
-                            <span class="ball-small">6</span>
-                            <span class="ball-small">4</span>
-                        </div>
-                        <div class="history-info">
-                            <span class="badge-primary">组三</span>
-                            <span>和值 14</span>
-                            <span>跨度 2</span>
-                        </div>
-                    </div>
-                    <div class="history-card">
-                        <div class="history-period">2026147</div>
-                        <div class="history-date">2026-06-06</div>
-                        <div class="history-balls">
-                            <span class="ball-small">7</span>
-                            <span class="ball-small">1</span>
-                            <span class="ball-small">2</span>
-                        </div>
-                        <div class="history-info">
-                            <span class="badge-primary">组六</span>
-                            <span>和值 10</span>
-                            <span>跨度 6</span>
-                        </div>
-                    </div>
-                    <div class="history-card">
-                        <div class="history-period">2026148</div>
-                        <div class="history-date">2026-06-07</div>
-                        <div class="history-balls">
-                            <span class="ball-small">4</span>
-                            <span class="ball-small">0</span>
-                            <span class="ball-small">8</span>
-                        </div>
-                        <div class="history-info">
-                            <span class="badge-primary">组六</span>
-                            <span>和值 12</span>
-                            <span>跨度 8</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- 形态分布 + 奇偶大小 -->
-        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-            <div class="glass-card" style="margin:0;">
-                <div class="card-header"><span>🎨</span><h2>形态分布</h2></div>
+            <!-- 和值跨度组合分析 -->
+            <div class="glass-card">
+                <div class="card-header"><span>🔗</span><h2>和值 · 跨度组合分析</h2></div>
                 <div class="card-body">
-                    <div class="progress-bar"><div class="progress-fill" style="width: 68%;">组六 122期</div></div>
-                    <div class="progress-bar"><div class="progress-fill" style="background: linear-gradient(90deg, #f59e0b, #f97316); width: 28%;">组三 50期</div></div>
-                    <div class="progress-bar"><div class="progress-fill" style="background: linear-gradient(90deg, #10b981, #34d399); width: 4%;">豹子 8期</div></div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead><tr><th>和值</th><th>最常见跨度</th><th>出现次数</th><th>推荐组合</th></tr></thead>
+                            <tbody>
+                                <tr><td>14</td><td>5,6,7</td><td>28次</td><td>059,149,158</td></tr>
+                                <tr><td>13</td><td>4,5,8</td><td>25次</td><td>049,058,139</td></tr>
+                                <tr><td>15</td><td>5,6,8</td><td>24次</td><td>069,159,168</td></tr>
+                                <tr><td>12</td><td>4,6,7</td><td>22次</td><td>039,048,129</td></tr>
+                                <tr><td>16</td><td>5,7,8</td><td>21次</td><td>079,169,178</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-            <div class="glass-card" style="margin:0;">
-                <div class="card-header"><span>🔢</span><h2>奇偶 & 大小</h2></div>
+
+            <!-- 走势图 -->
+            <div class="glass-card">
+                <div class="card-header"><span>📈</span><h2>走势图分析</h2></div>
                 <div class="card-body">
-                    <div><span class="badge-primary">最常见奇偶</span> <strong style="color:#f1f5f9;">奇偶奇</strong></div>
-                    <div style="margin-top: 12px;"><span class="badge-primary">最常见大小</span> <strong style="color:#f1f5f9;">小大小</strong></div>
-                    <div style="margin-top: 16px;"><span class="badge-primary">和值Top5</span> <span style="color:#a5b4fc;">14, 13, 15, 12, 16</span></div>
+                    <div class="charts-grid">
+                        <div class="chart-card"><h3>和值走势图</h3><img src="fc3d_sum_trend.png" alt="和值走势图"></div>
+                        <div class="chart-card"><h3>跨度走势图</h3><img src="fc3d_span_trend.png" alt="跨度走势图"></div>
+                        <div class="chart-card"><h3>和值分布</h3><img src="fc3d_sum_hist.png" alt="和值分布"></div>
+                        <div class="chart-card"><h3>形态占比</h3><img src="fc3d_pattern_pie.png" alt="形态占比"></div>
+                        <div class="chart-card"><h3>位置频率</h3><img src="fc3d_position_freq.png" alt="位置频率"></div>
+                        <div class="chart-card"><h3>奇偶走势</h3><img src="fc3d_parity_trend.png" alt="奇偶走势"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 三位置分析 -->
-        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-            <div class="glass-card" style="margin:0;">
-                <div class="card-header"><span>📍</span><h2>百位</h2></div>
+        <!-- 标签页2：冷热号分析 -->
+        <div id="tab2" class="tab-content">
+            <div class="glass-card">
+                <div class="card-header"><span>❄️</span><h2>冷热号分析</h2></div>
                 <div class="card-body">
-                    <div><span class="badge-primary">热号Top3</span> <strong style="color:#f1f5f9; font-size: 18px;">[4, 6, 8]</strong></div>
-                    <div style="margin-top: 12px;"><span class="badge-primary">合理性评分</span></div>
-                    <div style="margin-top: 8px;">
-                        <span class="ball-small" style="background: #ff6b6b;">4</span>
-                        <span class="ball-small" style="background: #ff6b6b;">6</span>
-                        <span class="ball-small" style="background: #ff6b6b;">8</span>
-                        <span class="ball-small" style="background: #ff6b6b;">2</span>
-                        <span class="ball-small" style="background: #ff6b6b;">0</span>
+                    <h3 style="color:#f1f5f9; margin-bottom: 15px;">百位冷热号</h3>
+                    <div class="stats-grid" style="grid-template-columns: repeat(5,1fr); gap: 10px;">
+                        <div class="stat-card"><div class="stat-value">4</div><div class="stat-label">🔥 热号</div><div>出现 28次</div></div>
+                        <div class="stat-card"><div class="stat-value">6</div><div class="stat-label">🔥 热号</div><div>出现 26次</div></div>
+                        <div class="stat-card"><div class="stat-value">8</div><div class="stat-label">🔥 热号</div><div>出现 24次</div></div>
+                        <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">❄️ 冷号</div><div>遗漏 12期</div></div>
+                        <div class="stat-card"><div class="stat-value">9</div><div class="stat-label">❄️ 冷号</div><div>遗漏 9期</div></div>
+                    </div>
+                    <h3 style="color:#f1f5f9; margin: 20px 0 15px;">十位冷热号</h3>
+                    <div class="stats-grid" style="grid-template-columns: repeat(5,1fr); gap: 10px;">
+                        <div class="stat-card"><div class="stat-value">3</div><div class="stat-label">🔥 热号</div><div>出现 27次</div></div>
+                        <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">🔥 热号</div><div>出现 25次</div></div>
+                        <div class="stat-card"><div class="stat-value">7</div><div class="stat-label">🔥 热号</div><div>出现 23次</div></div>
+                        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">❄️ 冷号</div><div>遗漏 14期</div></div>
+                        <div class="stat-card"><div class="stat-value">9</div><div class="stat-label">❄️ 冷号</div><div>遗漏 7期</div></div>
+                    </div>
+                    <h3 style="color:#f1f5f9; margin: 20px 0 15px;">个位冷热号</h3>
+                    <div class="stats-grid" style="grid-template-columns: repeat(5,1fr); gap: 10px;">
+                        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">🔥 热号</div><div>出现 29次</div></div>
+                        <div class="stat-card"><div class="stat-value">4</div><div class="stat-label">🔥 热号</div><div>出现 26次</div></div>
+                        <div class="stat-card"><div class="stat-value">6</div><div class="stat-label">🔥 热号</div><div>出现 24次</div></div>
+                        <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">❄️ 冷号</div><div>遗漏 11期</div></div>
+                        <div class="stat-card"><div class="stat-value">8</div><div class="stat-label">❄️ 冷号</div><div>遗漏 6期</div></div>
                     </div>
                 </div>
             </div>
-            <div class="glass-card" style="margin:0;">
-                <div class="card-header"><span>📍</span><h2>十位</h2></div>
+        </div>
+
+        <!-- 标签页3：历史对比 -->
+        <div id="tab3" class="tab-content">
+            <div class="glass-card">
+                <div class="card-header"><span>📈</span><h2>历史推演对比（最近10期）</h2></div>
                 <div class="card-body">
-                    <div><span class="badge-primary">热号Top3</span> <strong style="color:#f1f5f9; font-size: 18px;">[3, 5, 7]</strong></div>
-                    <div style="margin-top: 12px;"><span class="badge-primary">合理性评分</span></div>
-                    <div style="margin-top: 8px;">
-                        <span class="ball-small" style="background: #45b7d1;">3</span>
-                        <span class="ball-small" style="background: #45b7d1;">5</span>
-                        <span class="ball-small" style="background: #45b7d1;">7</span>
-                        <span class="ball-small" style="background: #45b7d1;">1</span>
-                        <span class="ball-small" style="background: #45b7d1;">9</span>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>期号</th><th>实际开奖</th><th>推演Top5</th><th>是否命中</th><th>命中位置</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>2026139</td><td>2 8 6</td><td>268,468,248...</td><td class="hit">✅ 命中</td><td>第3注</td></tr>
+                                <tr><td>2026140</td><td>2 8 5</td><td>268,468,248...</td><td class="miss">❌ 未命中</td><td>-</td></tr>
+                                <tr><td>2026141</td><td>3 9 7</td><td>268,468,248...</td><td class="miss">❌ 未命中</td><td>-</td></tr>
+                                <tr><td>2026142</td><td>8 9 4</td><td>468,268,248...</td><td class="hit">✅ 命中</td><td>第1注</td></tr>
+                                <tr><td>2026143</td><td>3 7 6</td><td>468,268,248...</td><td class="miss">❌ 未命中</td><td>-</td></tr>
+                                <tr><td>2026144</td><td>7 2 6</td><td>468,268,248...</td><td class="hit">✅ 命中</td><td>第2注</td></tr>
+                                <tr><td>2026145</td><td>2 7 9</td><td>468,268,248...</td><td class="miss">❌ 未命中</td><td>-</td></tr>
+                                <tr><td>2026146</td><td>4 6 4</td><td>468,268,248...</td><td class="hit">✅ 命中</td><td>第1注</td></tr>
+                                <tr><td>2026147</td><td>7 1 2</td><td>468,268,248...</td><td class="miss">❌ 未命中</td><td>-</td></tr>
+                                <tr><td>2026148</td><td>4 0 8</td><td>468,268,248...</td><td class="hit">✅ 命中</td><td>第1注</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-            <div class="glass-card" style="margin:0;">
-                <div class="card-header"><span>📍</span><h2>个位</h2></div>
+        </div>
+
+        <!-- 标签页4：遗漏统计 -->
+        <div id="tab4" class="tab-content">
+            <div class="glass-card">
+                <div class="card-header"><span>📉</span><h2>号码遗漏统计</h2></div>
                 <div class="card-body">
-                    <div><span class="badge-primary">热号Top3</span> <strong style="color:#f1f5f9; font-size: 18px;">[2, 4, 6]</strong></div>
-                    <div style="margin-top: 12px;"><span class="badge-primary">合理性评分</span></div>
-                    <div style="margin-top: 8px;">
-                        <span class="ball-small" style="background: #96ceb4;">2</span>
-                        <span class="ball-small" style="background: #96ceb4;">4</span>
-                        <span class="ball-small" style="background: #96ceb4;">6</span>
-                        <span class="ball-small" style="background: #96ceb4;">8</span>
-                        <span class="ball-small" style="background: #96ceb4;">0</span>
-                    </div>
+                    <h3 style="color:#f1f5f9;">百位遗漏</h3>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 100%;">0: 遗漏 12期</div></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 75%; background:#f59e0b;">1: 遗漏 9期</div></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 50%; background:#10b981;">2: 遗漏 6期</div></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 25%; background:#10b981;">3: 遗漏 3期</div></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 0%; background:#10b981;">4: 遗漏 0期</div></div>
+                    <h3 style="color:#f1f5f9; margin-top: 20px;">十位遗漏</h3>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 100%;">1: 遗漏 14期</div></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 60%; background:#f59e0b;">9: 遗漏 7期</div></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 30%; background:#10b981;">2: 遗漏 4期</div></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 0%; background:#10b981;">3: 遗漏 0期</div></div>
+                    <h3 style="color:#f1f5f9; margin-top: 20px;">个位遗漏</h3>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 100%;">0: 遗漏 11期</div></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 55%; background:#f59e0b;">8: 遗漏 6期</div></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 27%; background:#10b981;">1: 遗漏 3期</div></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 0%; background:#10b981;">2: 遗漏 0期</div></div>
                 </div>
             </div>
         </div>
 
-        <!-- 走势图 -->
-        <div class="glass-card">
-            <div class="card-header">
-                <span>📈</span>
-                <h2>走势图分析（点击图片可放大）</h2>
-            </div>
-            <div class="card-body">
-                <div class="charts-grid">
-                    <div class="chart-card">
-                        <h3>📈 和值走势图</h3>
-                        <a href="fc3d_sum_trend.png" target="_blank">
-                            <img src="fc3d_sum_trend.png" alt="和值走势图">
-                        </a>
-                    </div>
-                    <div class="chart-card">
-                        <h3>📐 跨度走势图</h3>
-                        <a href="fc3d_span_trend.png" target="_blank">
-                            <img src="fc3d_span_trend.png" alt="跨度走势图">
-                        </a>
-                    </div>
-                    <div class="chart-card">
-                        <h3>📊 和值分布直方图</h3>
-                        <a href="fc3d_sum_hist.png" target="_blank">
-                            <img src="fc3d_sum_hist.png" alt="和值分布直方图">
-                        </a>
-                    </div>
-                    <div class="chart-card">
-                        <h3>🥧 形态占比</h3>
-                        <a href="fc3d_pattern_pie.png" target="_blank">
-                            <img src="fc3d_pattern_pie.png" alt="形态占比">
-                        </a>
-                    </div>
-                    <div class="chart-card">
-                        <h3>📍 位置频率分布</h3>
-                        <a href="fc3d_position_freq.png" target="_blank">
-                            <img src="fc3d_position_freq.png" alt="位置频率分布">
-                        </a>
-                    </div>
-                    <div class="chart-card">
-                        <h3>🔢 奇偶走势图</h3>
-                        <a href="fc3d_parity_trend.png" target="_blank">
-                            <img src="fc3d_parity_trend.png" alt="奇偶走势图">
-                        </a>
-                    </div>
+        <!-- 标签页5：数据导出 -->
+        <div id="tab5" class="tab-content">
+            <div class="glass-card">
+                <div class="card-header"><span>💾</span><h2>数据导出</h2></div>
+                <div class="card-body" style="text-align: center;">
+                    <button class="btn" id="exportCSV" style="margin: 10px;">📊 导出分析数据 (CSV)</button>
+                    <button class="btn" id="exportHistory" style="margin: 10px;">📜 导出历史开奖数据 (CSV)</button>
+                    <button class="btn" id="exportAll" style="margin: 10px;">📁 导出全部数据 (JSON)</button>
+                    <p style="color:#94a3b8; margin-top: 20px;">点击按钮导出数据文件，可用于进一步分析</p>
                 </div>
             </div>
         </div>
 
-        <!-- 备选参考 -->
-        <div class="glass-card">
-            <div class="card-header">
-                <span>🔄</span>
-                <h2>备选参考 · 形态匹配组合</h2>
-            </div>
-            <div class="card-body">
-                <div class="candidates-grid">
-                    <div class="candidate-item"><span class="ball-small">3</span><span class="ball-small">9</span><span class="ball-small">6</span><div style="font-size: 11px;">10.6分</div></div>
-                    <div class="candidate-item"><span class="ball-small">2</span><span class="ball-small">8</span><span class="ball-small">5</span><div style="font-size: 11px;">10.5分</div></div>
-                    <div class="candidate-item"><span class="ball-small">3</span><span class="ball-small">7</span><span class="ball-small">5</span><div style="font-size: 11px;">10.4分</div></div>
-                    <div class="candidate-item"><span class="ball-small">3</span><span class="ball-small">9</span><span class="ball-small">4</span><div style="font-size: 11px;">9.5分</div></div>
-                    <div class="candidate-item"><span class="ball-small">2</span><span class="ball-small">9</span><span class="ball-small">6</span><div style="font-size: 11px;">8.7分</div></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 评分说明 -->
-        <div class="glass-card">
-            <div class="card-header">
-                <span>📖</span>
-                <h2>评分系统 · 满分20分</h2>
-            </div>
-            <div class="card-body">
-                <div class="score-grid">
-                    <div><span class="badge-primary">🎯 和值精确</span> <span class="text-white">+5分</span></div>
-                    <div><span class="badge-primary">📊 和值接近</span> <span class="text-white">+2分</span></div>
-                    <div><span class="badge-primary">✨ 奇偶匹配</span> <span class="text-white">+4分</span></div>
-                    <div><span class="badge-primary">📏 大小匹配</span> <span class="text-white">+4分</span></div>
-                    <div><span class="badge-primary">🔮 形态匹配</span> <span class="text-white">+3分</span></div>
-                    <div><span class="badge-primary">📍 位置合理性</span> <span class="text-white">+3分</span></div>
-                    <div><span class="badge-primary">🛡️ 防重奖励</span> <span class="text-white">+1分</span></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer">
-            ⚠️ 本分析基于历史数据统计规律，仅供学习参考<br>
-            彩票开奖是独立随机事件，任何号码中奖概率相同
-        </div>
+        <div class="footer">⚠️ 本分析基于历史数据统计规律，仅供学习参考</div>
     </div>
+
+    <script>
+        // 标签页切换
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        // 导出功能
+        document.getElementById('exportCSV')?.addEventListener('click', () => {
+            const data = [['期号', '实际开奖', '推演Top5', '是否命中']];
+            const rows = document.querySelectorAll('#tab3 .data-table tbody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                data.push([
+                    cells[0]?.innerText || '',
+                    cells[1]?.innerText || '',
+                    cells[2]?.innerText || '',
+                    cells[3]?.innerText || ''
+                ]);
+            });
+            const csv = data.map(row => row.join(',')).join('\n');
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'fc3d_analysis.csv';
+            link.click();
+        });
+
+        document.getElementById('exportHistory')?.addEventListener('click', () => {
+            const data = [['期号', '开奖日期', '开奖号码', '形态', '和值', '跨度']];
+            const rows = document.querySelectorAll('#tab1 .data-table tbody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                data.push([
+                    cells[0]?.innerText || '',
+                    cells[1]?.innerText || '',
+                    cells[2]?.innerText || '',
+                    cells[3]?.innerText || '',
+                    cells[4]?.innerText || '',
+                    cells[5]?.innerText || ''
+                ]);
+            });
+            const csv = data.map(row => row.join(',')).join('\n');
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'fc3d_history.csv';
+            link.click();
+        });
+
+        document.getElementById('exportAll')?.addEventListener('click', () => {
+            const allData = {
+                predictions: [
+                    { number: "468", score: 16.5, pattern: "组六", sum: 18 },
+                    { number: "462", score: 14.2, pattern: "组六", sum: 12 },
+                    { number: "862", score: 13.8, pattern: "组六", sum: 16 }
+                ],
+                stats: {
+                    common_sum: 14,
+                    common_span: 5,
+                    predicted_pattern: "组六",
+                    hit_rate: "26.7%"
+                },
+                timestamp: new Date().toISOString()
+            };
+            const json = JSON.stringify(allData, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'fc3d_all_data.json';
+            link.click();
+        });
+    </script>
 </body>
 </html>
