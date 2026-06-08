@@ -2,7 +2,7 @@ name: 福彩3D自动分析
 
 on:
   schedule:
-    - cron: '0 10 * * *'  # UTC 10:00 = 北京时间 18:00
+    - cron: '0 10 * * *'
   workflow_dispatch:
 
 permissions:
@@ -32,6 +32,8 @@ jobs:
         pip install pandas numpy matplotlib requests beautifulsoup4 openpyxl lxml
     
     - name: 运行分析程序
+      env:
+        DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
       run: python 福彩3D顶尖分析系统.py
     
     - name: 复制文件到 docs 目录
