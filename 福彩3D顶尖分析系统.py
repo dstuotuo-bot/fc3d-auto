@@ -35,7 +35,6 @@ def fetch_data():
     all_data = []
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
     
-    # 抓取前10页，确保覆盖最新数据
     for page in range(1, 11):
         url = f"http://kaijiang.zhcw.com/zhcw/html/3d/list_{page}.html"
         try:
@@ -45,7 +44,7 @@ def fetch_data():
             soup = BeautifulSoup(r.text, 'html.parser')
             rows = soup.find_all('tr')
             
-            for row in rows[2:]:  # 跳过表头
+            for row in rows[2:]:
                 cols = row.find_all('td')
                 if len(cols) >= 3:
                     period = cols[1].text.strip()
@@ -57,7 +56,6 @@ def fetch_data():
         except Exception as e:
             print(f"  抓取第{page}页失败: {e}")
     
-    # 去重并按期号排序（最新在前）
     seen = set()
     unique = []
     for d in all_data:
@@ -83,7 +81,6 @@ def load_data():
     
     if data:
         df = pd.DataFrame(data)
-        # 保存备份
         df.to_excel(file_path, index=False)
         print(f"  📁 数据已更新，共 {len(df)} 期")
     else:
@@ -94,7 +91,6 @@ def load_data():
         df = pd.read_excel(file_path, dtype={'开奖号码': str})
         print(f"  📁 使用本地备份，共 {len(df)} 期")
     
-    # 数据清洗
     df['开奖号码'] = df['开奖号码'].str.replace(' ', '')
     df['开奖日期'] = pd.to_datetime(df['开奖日期'])
     df = df.sort_values('开奖日期').reset_index(drop=True)
@@ -160,11 +156,9 @@ def call_deepseek(prompt):
 
 def ai_verify_predictions(candidates, df_recent, features):
     """AI 验证推演结果"""
-    # 准备历史数据摘要
     recent_10 = df_recent.tail(10)[['期号', '开奖号码', '和值', '跨度', '形态']].to_dict('records')
     history_summary = f"最近10期开奖: {recent_10}"
     
-    # 准备候选号码
     candidates_summary = []
     for c in candidates[:10]:
         candidates_summary.append({
@@ -193,12 +187,7 @@ def ai_verify_predictions(candidates, df_recent, features):
 {json.dumps(candidates_summary, ensure_ascii=False, indent=2)}
 
 请输出JSON格式：
-{{
-    "verified_predictions": [
-        {{"number": "号码", "ai_score": 0-100, "reason": "推荐理由"}}
-    ],
-    "analysis": "简要分析"
-}}
+{{"verified_predictions": [{{"number": "号码", "ai_score": 0-100, "reason": "推荐理由"}}], "analysis": "简要分析"}}
 """
     
     result = call_deepseek(prompt)
@@ -234,7 +223,6 @@ def generate_charts(df):
     recent_15 = df.tail(15).copy()
     recent_15 = recent_15.reset_index(drop=True)
     
-    # 图1：和值走势图
     try:
         fig, ax = plt.subplots(figsize=(16, 8))
         sums = recent_15['和值'].tolist()
@@ -258,7 +246,6 @@ def generate_charts(df):
     except Exception as e:
         print(f"  ⚠️ 和值走势图失败: {e}")
     
-    # 图2：跨度走势图
     try:
         fig, ax = plt.subplots(figsize=(16, 8))
         spans = recent_15['跨度'].tolist()
@@ -282,7 +269,6 @@ def generate_charts(df):
     except Exception as e:
         print(f"  ⚠️ 跨度走势图失败: {e}")
     
-    # 图3：和值分布直方图
     try:
         fig, ax = plt.subplots(figsize=(20, 10))
         all_sums = df['和值'].tolist()
@@ -300,7 +286,6 @@ def generate_charts(df):
     except Exception as e:
         print(f"  ⚠️ 和值分布图失败: {e}")
     
-    # 图4：形态占比饼图
     try:
         fig, ax = plt.subplots(figsize=(10, 8))
         pattern_cnt = Counter(df['形态'])
@@ -316,7 +301,6 @@ def generate_charts(df):
     except Exception as e:
         print(f"  ⚠️ 形态饼图失败: {e}")
     
-    # 图5：各位置数字频率
     try:
         fig, axes = plt.subplots(1, 3, figsize=(18, 6))
         positions = ['百位', '十位', '个位']
@@ -340,7 +324,6 @@ def generate_charts(df):
     except Exception as e:
         print(f"  ⚠️ 位置频率图失败: {e}")
     
-    # 图6：奇偶走势图
     try:
         fig, ax = plt.subplots(figsize=(16, 8))
         periods = recent_15['期号'].tolist()
@@ -496,7 +479,6 @@ def rule_predict(df, pos_data, features, predicted_pattern):
 def hybrid_predict(df, pos_data, features, predicted_pattern):
     """混合模式推演：规则推演 + AI验证"""
     
-    # 第一步：规则推演
     print("\n" + "=" * 80)
     print("【第一步：规则推演】")
     print("=" * 80)
@@ -504,14 +486,12 @@ def hybrid_predict(df, pos_data, features, predicted_pattern):
     print(f"规则推演生成 {len(candidates)} 个候选号码")
     print(f"Top5 候选: {[c['号码'] for c in candidates[:5]]}")
     
-    # 第二步：AI验证
     print("\n" + "=" * 80)
     print("【第二步：AI验证】")
     print("=" * 80)
     
     ai_result = ai_verify_predictions(candidates, df, features)
     
-    # 第三步：综合排序
     print("\n" + "=" * 80)
     print("【第三步：综合排序】")
     print("=" * 80)
@@ -557,6 +537,44 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
     charts_html = ''
     for chart in chart_files:
         charts_html += f'<div class="chart-card"><a href="{chart}" target="_blank"><img src="{chart}" alt="走势图"></a></div>'
+    
+    # 获取最新开奖数据
+    latest_numbers = df.iloc[-1]['开奖号码']
+    latest_pattern = df.iloc[-1]['形态']
+    latest_sum = df.iloc[-1]['和值']
+    latest_span = df.iloc[-1]['跨度']
+    latest_period = df.iloc[-1]['期号']
+    
+    # 生成推演结果HTML
+    predictions_html = ''
+    for i, c in enumerate(candidates[:5], 1):
+        nums = list(c['号码'])
+        score_class = "score-high" if c['综合得分'] >= 16 else "score-mid" if c['综合得分'] >= 12 else "score-low"
+        ai_badge = f'<div class="ai-score">AI:{c.get("ai得分", 50)}分</div>' if 'ai得分' in c else ''
+        predictions_html += f'''
+                    <div class="prediction-item">
+                        <div class="prediction-balls">
+                            <div class="ball-large">{nums[0]}</div>
+                            <div class="ball-large">{nums[1]}</div>
+                            <div class="ball-large">{nums[2]}</div>
+                        </div>
+                        <div><span class="prediction-score {score_class}">{c['综合得分']}分</span></div>
+                        {ai_badge}
+                        <div style="font-size: 11px; color:#94a3b8; margin-top: 5px;">形态:{c['形态']} | 和值:{c['和值']}</div>
+                    </div>
+'''
+    
+    # 最近5期HTML
+    recent_5_html = ''
+    for _, row in recent_5.iterrows():
+        nums = row['开奖号码']
+        recent_5_html += f'<tr><td style="font-weight:600;">{row["期号"]}</td><td>{row["开奖日期"].strftime("%Y-%m-%d")}</td><td><span class="ball-small">{nums[0]}</span><span class="ball-small">{nums[1]}</span><span class="ball-small">{nums[2]}</span></td><td>{row["形态"]}</td><td>{row["和值"]}</td><td>{row["跨度"]}</td></tr>'
+    
+    # 历史对比HTML
+    history_html = ''
+    for _, row in df.tail(10).iterrows():
+        nums = row['开奖号码']
+        history_html += f'<tr><td style="font-weight:600;">{row["期号"]}</td><td>{nums[0]} {nums[1]} {nums[2]}</td><td>468, 462, 862, 482, 486</td><td class="hit">✅ 命中</td><td>第1注</td></tr>'
     
     html = f'''<!DOCTYPE html>
 <html lang="zh-CN">
@@ -707,16 +725,16 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
             <div class="latest-header"><span>🎯 最新开奖 · 每日21:50自动更新</span></div>
             <div class="latest-body">
                 <div class="latest-numbers">
-                    <div class="latest-ball">{df.iloc[-1]['开奖号码'][0]}</div>
-                    <div class="latest-ball">{df.iloc[-1]['开奖号码'][1]}</div>
-                    <div class="latest-ball">{df.iloc[-1]['开奖号码'][2]}</div>
+                    <div class="latest-ball">{latest_numbers[0]}</div>
+                    <div class="latest-ball">{latest_numbers[1]}</div>
+                    <div class="latest-ball">{latest_numbers[2]}</div>
                 </div>
                 <div class="latest-info">
-                    <span class="latest-info-item">🎨 形态: {df.iloc[-1]['形态']}</span>
-                    <span class="latest-info-item">🔢 和值: {df.iloc[-1]['和值']}</span>
-                    <span class="latest-info-item">📏 跨度: {df.iloc[-1]['跨度']}</span>
+                    <span class="latest-info-item">🎨 形态: {latest_pattern}</span>
+                    <span class="latest-info-item">🔢 和值: {latest_sum}</span>
+                    <span class="latest-info-item">📏 跨度: {latest_span}</span>
                 </div>
-                <div class="update-note">✅ 数据每日21:50自动更新 | 最新期号: {df.iloc[-1]['期号']}</div>
+                <div class="update-note">✅ 数据每日21:50自动更新 | 最新期号: {latest_period}</div>
             </div>
         </div>
 
@@ -735,29 +753,10 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
             <div class="card-header"><span>⭐</span><h2>智能推演 · 下一期预测（混合模式：规则+AI）</h2></div>
             <div class="card-body">
                 <div class="prediction-grid">
-'''
-    
-    for i, c in enumerate(candidates[:5], 1):
-        nums = list(c['号码'])
-        score_class = "score-high" if c['综合得分'] >= 16 else "score-mid" if c['综合得分'] >= 12 else "score-low"
-        ai_badge = f'<div class="ai-score">AI:{c.get("ai得分", 50)}分</div>' if 'ai得分' in c else ''
-        html += f'''
-                    <div class="prediction-item">
-                        <div class="prediction-balls">
-                            <div class="ball-large">{nums[0]}</div>
-                            <div class="ball-large">{nums[1]}</div>
-                            <div class="ball-large">{nums[2]}</div>
-                        </div>
-                        <div><span class="prediction-score {score_class}">{c['综合得分']}分</span></div>
-                        {ai_badge}
-                        <div style="font-size: 11px; color:#94a3b8; margin-top: 5px;">形态:{c['形态']} | 和值:{c['和值']}</div>
-                    </div>
-'''
-    
-    html += f'''
+                    {predictions_html}
                 </div>
                 <div style="margin-top: 15px; padding: 10px; background: rgba(239,68,68,0.1); border-radius: 12px;">
-                    <p style="color:#f87171; font-size: 12px;">⚠️ 已排除上期完全相同号码 {df.iloc[-1]['开奖号码']}</p>
+                    <p style="color:#f87171; font-size: 12px;">⚠️ 已排除上期完全相同号码 {latest_numbers}</p>
                 </div>
             </div>
         </div>
@@ -827,13 +826,7 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
                         <table class="data-table">
                             <thead><tr><th>期号</th><th>实际开奖</th><th>推演Top5</th><th>是否命中</th><th>命中位置</th></tr></thead>
                             <tbody>
-'''
-    
-    for _, row in df.tail(10).iterrows():
-        nums = row['开奖号码']
-        html += f'<tr><td style="font-weight:600;">{row["期号"]}</td><td>{nums[0]} {nums[1]} {nums[2]}</td><td>468, 462, 862, 482, 486</td><td class="hit">✅ 命中</td><td>第1注</td></tr>'
-    
-    html += f'''
+                                {history_html}
                             </tbody>
                         </table>
                     </div>
@@ -919,7 +912,7 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
                     <div class="method-card">
                         <div class="method-name">🔄 重号杀号法</div>
                         <div class="method-detail">
-                            <span>上期开奖: {df.iloc[-1]['开奖号码']} | 杀重号: {df.iloc[-1]['开奖号码'][0]},{df.iloc[-1]['开奖号码'][1]},{df.iloc[-1]['开奖号码'][2]}</span>
+                            <span>上期开奖: {latest_numbers} | 杀重号: {latest_numbers[0]},{latest_numbers[1]},{latest_numbers[2]}</span>
                             <span class="confidence-mid">准确率 65.3% | AI验证: ⚠️谨慎</span>
                         </div>
                         <div class="progress-bar"><div class="progress-fill" style="width: 65.3%; background:#f59e0b;">历史命中 65.3%</div></div>
@@ -937,7 +930,7 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
                                 <tr><td class="badge-primary">高置信度</td><td class="text-gray">000, 111, 222... 999</td><td style="color:#34d399;">95%</td><td class="text-gray">强烈推荐杀号</td></tr>
                                 <tr><td class="badge-primary">高置信度</td><td class="text-gray">和值0-3, 25-27的组合</td><td style="color:#34d399;">92%</td><td class="text-gray">强烈推荐杀号</td></tr>
                                 <tr><td class="badge-primary">中置信度</td><td class="text-gray">全奇、全偶组合</td><td style="color:#f59e0b;">75%</td><td class="text-gray">推荐杀号</td></tr>
-                                <tr><td class="badge-primary">低置信度</td><td class="text-gray">上期号码: {df.iloc[-1]['开奖号码']}</td><td style="color:#f87171;">35%</td><td class="text-gray">谨慎杀号</td></tr>
+                                <tr><td class="badge-primary">低置信度</td><td class="text-gray">上期号码: {latest_numbers}</td><td style="color:#f87171;">35%</td><td class="text-gray">谨慎杀号</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -955,24 +948,24 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
     </div>
 
     <script>
-        function updateClock() {
+        function updateClock() {{
             const now = new Date();
             const beijingTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
             const hours = beijingTime.getUTCHours().toString().padStart(2, '0');
             const minutes = beijingTime.getUTCMinutes().toString().padStart(2, '0');
             const seconds = beijingTime.getUTCSeconds().toString().padStart(2, '0');
             const clockElement = document.getElementById('liveClock');
-            if (clockElement) clockElement.textContent = `${hours}:${minutes}:${seconds}`;
-        }
+            if (clockElement) clockElement.textContent = hours + ":" + minutes + ":" + seconds;
+        }}
         
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(btn => {{
+            btn.addEventListener('click', () => {{
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                 btn.classList.add('active');
                 document.getElementById(btn.dataset.tab).classList.add('active');
-            });
-        });
+            }});
+        }});
 
         updateClock();
         setInterval(updateClock, 1000);
