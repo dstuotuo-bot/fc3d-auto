@@ -2,7 +2,7 @@ name: 福彩3D自动分析
 
 on:
   schedule:
-    - cron: '50 13 * * *'  # UTC 13:50 = 北京时间 21:50
+    - cron: '50 13 * * *'
   workflow_dispatch:
 
 permissions:
@@ -36,16 +36,10 @@ jobs:
         DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
       run: python 福彩3D顶尖分析系统.py
     
-    - name: 复制文件到 docs 目录
+    - name: 提交数据文件到仓库
       run: |
-        mkdir -p docs
-        cp fc3d_report.html docs/index.html
-        cp fc3d_*.png docs/ 2>/dev/null || true
-    
-    - name: 部署到GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs
-        publish_branch: gh-pages
-        keep_files: false
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add fc3d_data.xlsx fc3d_report.html fc3d_*.png
+        git commit -m "auto: 更新开奖数据 $(date '+%Y-%m-%d %H:%M:%S')" || echo "无变化"
+        git push
