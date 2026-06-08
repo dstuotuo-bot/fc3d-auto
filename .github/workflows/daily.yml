@@ -34,77 +34,77 @@ jobs:
     - name: 抓取最新数据
       run: |
         python << 'EOF'
-import requests
-import pandas as pd
-from bs4 import BeautifulSoup
-from datetime import datetime
-import os
-
-def fetch_data():
-    """抓取福彩3D历史数据"""
-    all_data = []
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-    
-    # 尝试多个数据源
-    urls = [
-        'https://www.500.com/cp/fc3d/kaijiang/',
-        'https://datachart.500.com/3d/history/history.php',
-        'http://kaijiang.zhcw.com/zhcw/html/3d/list_1.html'
-    ]
-    
-    for url in urls:
-        try:
-            print(f"尝试抓取: {url}")
-            r = requests.get(url, headers=headers, timeout=15)
-            if r.status_code != 200:
-                continue
-            soup = BeautifulSoup(r.text, 'html.parser')
+        import requests
+        import pandas as pd
+        from bs4 import BeautifulSoup
+        from datetime import datetime
+        import os
+        
+        def fetch_data():
+            """抓取福彩3D历史数据"""
+            all_data = []
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
             
-            # 尝试多种解析方式
-            rows = soup.find_all('tr')
-            for row in rows[2:22]:
-                cols = row.find_all('td')
-                if len(cols) >= 3:
-                    period = cols[0].text.strip()
-                    date = cols[1].text.strip()
-                    em = row.find_all('em')
-                    if len(em) >= 3:
-                        nums = f"{em[0].text.strip()}{em[1].text.strip()}{em[2].text.strip()}"
-                        all_data.append({'期号': period, '开奖日期': date, '开奖号码': nums})
+            # 尝试多个数据源
+            urls = [
+                'https://www.500.com/cp/fc3d/kaijiang/',
+                'https://datachart.500.com/3d/history/history.php',
+                'http://kaijiang.zhcw.com/zhcw/html/3d/list_1.html'
+            ]
             
-            if all_data:
-                print(f"成功从 {url} 抓取 {len(all_data)} 期数据")
-                break
-        except Exception as e:
-            print(f"抓取失败: {e}")
-            continue
-    
-    if not all_data:
-        # 使用备用数据（需要手动更新最新一期）
-        print("⚠️ 抓取失败，使用备用数据")
-        all_data = [
-            {'期号': '2026149', '开奖日期': '2026-06-08', '开奖号码': '123'},
-            {'期号': '2026148', '开奖日期': '2026-06-07', '开奖号码': '408'},
-            {'期号': '2026147', '开奖日期': '2026-06-06', '开奖号码': '712'},
-        ]
-    
-    # 去重排序
-    seen = set()
-    unique = []
-    for d in all_data:
-        if d['期号'] not in seen:
-            seen.add(d['期号'])
-            unique.append(d)
-    unique.sort(key=lambda x: int(x['期号']), reverse=True)
-    
-    # 保存
-    df = pd.DataFrame(unique)
-    df.to_excel('fc3d_data.xlsx', index=False)
-    print(f"✅ 数据已保存，共 {len(df)} 期，最新: {df.iloc[0]['期号'] if len(df) > 0 else '无'}")
-
-if __name__ == "__main__":
-    fetch_data()
-EOF
+            for url in urls:
+                try:
+                    print(f"尝试抓取: {url}")
+                    r = requests.get(url, headers=headers, timeout=15)
+                    if r.status_code != 200:
+                        continue
+                    soup = BeautifulSoup(r.text, 'html.parser')
+                    
+                    # 尝试多种解析方式
+                    rows = soup.find_all('tr')
+                    for row in rows[2:22]:
+                        cols = row.find_all('td')
+                        if len(cols) >= 3:
+                            period = cols[0].text.strip()
+                            date = cols[1].text.strip()
+                            em = row.find_all('em')
+                            if len(em) >= 3:
+                                nums = f"{em[0].text.strip()}{em[1].text.strip()}{em[2].text.strip()}"
+                                all_data.append({'期号': period, '开奖日期': date, '开奖号码': nums})
+                    
+                    if all_data:
+                        print(f"成功从 {url} 抓取 {len(all_data)} 期数据")
+                        break
+                except Exception as e:
+                    print(f"抓取失败: {e}")
+                    continue
+            
+            if not all_data:
+                # 使用备用数据（需要手动更新最新一期）
+                print("⚠️ 抓取失败，使用备用数据")
+                all_data = [
+                    {'期号': '2026149', '开奖日期': '2026-06-08', '开奖号码': '123'},
+                    {'期号': '2026148', '开奖日期': '2026-06-07', '开奖号码': '408'},
+                    {'期号': '2026147', '开奖日期': '2026-06-06', '开奖号码': '712'},
+                ]
+            
+            # 去重排序
+            seen = set()
+            unique = []
+            for d in all_data:
+                if d['期号'] not in seen:
+                    seen.add(d['期号'])
+                    unique.append(d)
+            unique.sort(key=lambda x: int(x['期号']), reverse=True)
+            
+            # 保存
+            df = pd.DataFrame(unique)
+            df.to_excel('fc3d_data.xlsx', index=False)
+            print(f"✅ 数据已保存，共 {len(df)} 期，最新: {df.iloc[0]['期号'] if len(df) > 0 else '无'}")
+        
+        if __name__ == "__main__":
+            fetch_data()
+        EOF
     
     - name: 运行分析程序
       env:
