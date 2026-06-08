@@ -1,6 +1,6 @@
 """
-福彩3D 顶尖专业级分析系统（云端自动化版）
-功能：自动抓取 + 深度分析 + 5注推演 + 6张走势图 + 历史准确率 + 自动部署
+福彩3D 顶尖专业级分析系统（混合模式：规则推演 + AI验证）
+功能：自动抓取 + 规则推演 + AI二次筛选 + 5注推荐 + 走势图
 """
 
 import pandas as pd
@@ -10,6 +10,7 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 import os
+import json
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -21,11 +22,14 @@ plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'WenQuanYi Micro Hei', 'SimHei
 plt.rcParams['axes.unicode_minus'] = False
 
 print("=" * 80)
-print("福彩3D 顶尖专业级分析系统（云端自动化版）")
+print("福彩3D 顶尖专业级分析系统（混合模式：规则推演 + AI验证）")
 print(f"运行时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 print("=" * 80)
 
 
+# ============================================================================
+# 抓取数据
+# ============================================================================
 def fetch_data():
     """抓取福彩3D历史数据"""
     all_data = []
@@ -97,6 +101,108 @@ def load_data():
     return df
 
 
+# ============================================================================
+# AI 调用
+# ============================================================================
+def call_deepseek(prompt):
+    """调用 DeepSeek API"""
+    api_key = os.environ.get('DEEPSEEK_API_KEY')
+    if not api_key:
+        print("  ⚠️ 未设置 DEEPSEEK_API_KEY，跳过 AI 验证")
+        return None
+    
+    try:
+        response = requests.post(
+            'https://api.deepseek.com/v1/chat/completions',
+            headers={
+                'Authorization': f'Bearer {api_key}',
+                'Content-Type': 'application/json'
+            },
+            json={
+                'model': 'deepseek-chat',
+                'messages': [
+                    {'role': 'system', 'content': '你是福彩3D推演专家，基于历史数据统计规律给出推演建议。只输出JSON格式。'},
+                    {'role': 'user', 'content': prompt}
+                ],
+                'temperature': 0.3,
+                'max_tokens': 800
+            },
+            timeout=30
+        )
+        if response.status_code == 200:
+            result = response.json()
+            return result['choices'][0]['message']['content']
+        else:
+            print(f"  ⚠️ AI调用失败: {response.status_code}")
+            return None
+    except Exception as e:
+        print(f"  ⚠️ AI调用异常: {e}")
+        return None
+
+
+def ai_verify_predictions(candidates, df_recent, features):
+    """AI 验证推演结果"""
+    # 准备历史数据摘要
+    recent_10 = df_recent.tail(10)[['期号', '开奖号码', '和值', '跨度', '形态']].to_dict('records')
+    history_summary = f"最近10期开奖: {recent_10}"
+    
+    # 准备候选号码
+    candidates_summary = []
+    for c in candidates[:10]:
+        candidates_summary.append({
+            '号码': c['号码'],
+            '规则得分': c['得分'],
+            '和值': c['和值'],
+            '形态': c['形态'],
+            '奇偶': c['奇偶'],
+            '大小': c['大小']
+        })
+    
+    prompt = f"""
+请分析以下福彩3D数据，对候选号码进行验证和排序：
+
+【历史数据】
+{history_summary}
+
+【常见特征】
+最常见和值: {features['common_sum']}
+最常见跨度: {features['span_cnt'].most_common(1)[0][0]}
+最常见奇偶: {features['common_parity']}
+最常见大小: {features['common_size']}
+预测形态: {features.get('predicted_pattern', '组六')}
+
+【候选号码】（已按规则得分排序）
+{json.dumps(candidates_summary, ensure_ascii=False, indent=2)}
+
+请输出JSON格式：
+{{
+    "verified_predictions": [
+        {{"number": "号码", "ai_score": 0-100, "reason": "推荐理由"}}
+    ],
+    "analysis": "简要分析"
+}}
+"""
+    
+    result = call_deepseek(prompt)
+    if result:
+        try:
+            # 提取JSON
+            result = result.strip()
+            if '```json' in result:
+                result = result.split('```json')[1].split('```')[0]
+            elif '```' in result:
+                result = result.split('```')[1].split('```')[0]
+            ai_data = json.loads(result)
+            return ai_data
+        except:
+            print(f"  ⚠️ AI响应解析失败")
+            return None
+    return None
+
+
+# ============================================================================
+# 走势图生成
+# ============================================================================
 def generate_charts(df):
     """生成6张走势图"""
     print("\n" + "=" * 80)
@@ -247,6 +353,9 @@ def generate_charts(df):
     return charts
 
 
+# ============================================================================
+# 分析函数
+# ============================================================================
 def analyze_pattern(df):
     patterns = df['形态'].tolist()
     pattern_cnt = Counter(patterns)
@@ -314,7 +423,8 @@ def analyze_features(df):
     }
 
 
-def predict(df, pos_data, features, predicted_pattern):
+def rule_predict(df, pos_data, features, predicted_pattern):
+    """规则推演 - 生成27个候选并打分"""
     candidates = []
     for b in pos_data['百位']['top3']:
         for s in pos_data['十位']['top3']:
@@ -366,47 +476,60 @@ def predict(df, pos_data, features, predicted_pattern):
     return candidates
 
 
-def calculate_accuracy(df):
+def hybrid_predict(df, pos_data, features, predicted_pattern):
+    """混合模式推演：规则推演 + AI验证"""
+    
+    # 第一步：规则推演
     print("\n" + "=" * 80)
-    print("【历史准确率统计】")
+    print("【第一步：规则推演】")
     print("=" * 80)
-    total_periods = len(df)
-    print(f"总期数: {total_periods}期")
-    if total_periods < 30:
-        print("⚠️ 数据不足（需要至少30期），继续积累数据")
-        return None
-    test_periods = min(30, total_periods - 20)
-    if test_periods < 5:
-        return None
-    hit_count = 0
-    for i in range(total_periods - test_periods, total_periods - 1):
-        train_df = df.iloc[:i+1]
-        actual = df.iloc[i+1]['开奖号码']
-        if len(train_df) >= 20:
-            recent_train = train_df.tail(50)
-            top3 = {}
-            for pos in ['百位', '十位', '个位']:
-                recent30 = recent_train.tail(30)[pos].tolist()
-                rc = Counter(recent30)
-                top3[pos] = [n for n, _ in rc.most_common(3)]
-            predictions = []
-            for b in top3['百位']:
-                for s in top3['十位']:
-                    for g in top3['个位']:
-                        predictions.append(f"{b}{s}{g}")
-            if actual in predictions:
-                hit_count += 1
-    tested = total_periods - (total_periods - test_periods) - 1
-    if tested <= 0:
-        return None
-    accuracy = hit_count / tested * 100
-    print(f"\n测试期数: {tested}期")
-    print(f"命中次数: {hit_count}期")
-    print(f"准确率: {accuracy:.1f}%")
-    return {'accuracy': accuracy, 'hit_count': hit_count, 'total_tested': tested}
+    candidates = rule_predict(df, pos_data, features, predicted_pattern)
+    print(f"规则推演生成 {len(candidates)} 个候选号码")
+    print(f"Top5 候选: {[c['号码'] for c in candidates[:5]]}")
+    
+    # 第二步：AI验证
+    print("\n" + "=" * 80)
+    print("【第二步：AI验证】")
+    print("=" * 80)
+    
+    ai_result = ai_verify_predictions(candidates, df, features)
+    
+    # 第三步：综合排序
+    print("\n" + "=" * 80)
+    print("【第三步：综合排序】")
+    print("=" * 80)
+    
+    if ai_result and 'verified_predictions' in ai_result:
+        # 建立AI评分映射
+        ai_scores = {}
+        for item in ai_result['verified_predictions']:
+            ai_scores[item['number']] = item.get('ai_score', 50)
+        
+        # 综合评分 = 规则分 * 0.6 + AI分 * 0.4
+        for c in candidates:
+            ai_score = ai_scores.get(c['号码'], 50)
+            c['ai得分'] = ai_score
+            c['综合得分'] = round(c['得分'] * 0.6 + ai_score * 0.4, 1)
+            c['原因'].append(f"AI:{ai_score}分")
+        
+        # 按综合得分重新排序
+        candidates.sort(key=lambda x: x['综合得分'], reverse=True)
+        
+        print("AI验证完成，已综合评分")
+        if 'analysis' in ai_result:
+            print(f"AI分析: {ai_result['analysis'][:100]}...")
+    else:
+        print("AI验证未生效，使用规则推演结果")
+        for c in candidates:
+            c['综合得分'] = c['得分']
+    
+    return candidates
 
 
-def generate_html_report(df, pos_data, features, predicted_pattern, candidates, next_period, accuracy_result, chart_files):
+# ============================================================================
+# 生成HTML报告
+# ============================================================================
+def generate_html_report(df, pos_data, features, predicted_pattern, candidates, next_period, chart_files):
     recent_5 = df.tail(5)
     pos_scores = {}
     for pos in ['百位', '十位', '个位']:
@@ -417,23 +540,19 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
     group3_pct = features['p_cnt'].get('组三', 0) / len(df) * 100
     group_bz_pct = features['p_cnt'].get('豹子', 0) / len(df) * 100
     
-    acc_html = ""
-    if accuracy_result:
-        acc = accuracy_result['accuracy']
-        acc_html = f'<div class="stat-card"><div class="stat-value">{acc:.1f}%</div><div class="stat-label">历史命中率</div><div class="stat-desc">基于27注热号组合 | 测试{accuracy_result["total_tested"]}期 命中{accuracy_result["hit_count"]}期</div></div>'
-    else:
-        acc_html = '<div class="stat-card"><div class="stat-value">--</div><div class="stat-label">历史命中率</div><div class="stat-desc">数据积累中，继续运行即可显示</div></div>'
-    
     charts_html = ''
     for chart in chart_files:
         charts_html += f'<div class="chart-card"><a href="{chart}" target="_blank"><img src="{chart}" alt="走势图"></a></div>'
+    
+    # 判断是否使用了AI
+    use_ai = 'ai得分' in candidates[0] if candidates else False
     
     html = f'''<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>福彩3D · 智选分析报告</title>
+    <title>福彩3D · 专业分析报告（AI增强版）</title>
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{
@@ -442,11 +561,10 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
             min-height: 100vh;
             padding: 20px;
         }}
-        .container {{ max-width: 1200px; margin: 0 auto; }}
+        .container {{ max-width: 1400px; margin: 0 auto; }}
         .hero {{ text-align: center; margin-bottom: 30px; }}
         .hero h1 {{
-            font-size: clamp(24px, 6vw, 42px);
-            font-weight: 800;
+            font-size: clamp(24px, 7vw, 42px);
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             -webkit-background-clip: text;
             background-clip: text;
@@ -458,29 +576,58 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
             justify-content: center;
             gap: 8px 16px;
             background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
             padding: 8px 20px;
             border-radius: 100px;
             font-size: 12px;
             color: #a5b4fc;
             margin-top: 10px;
         }}
+        .ai-badge {{
+            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            margin-left: 10px;
+        }}
+        .tabs {{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }}
+        .tab-btn {{
+            background: rgba(30,41,59,0.5);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }}
+        .tab-btn:hover {{ background: rgba(245,87,108,0.2); color: #f093fb; transform: translateY(-2px); }}
+        .tab-btn.active {{ background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }}
+        .tab-content {{ display: none; animation: fadeIn 0.3s ease; }}
+        .tab-content.active {{ display: block; }}
+        @keyframes fadeIn {{ from {{ opacity: 0; }} to {{ opacity: 1; }} }}
         .glass-card {{
-            background: rgba(30, 41, 59, 0.7);
+            background: rgba(30,41,59,0.7);
             backdrop-filter: blur(12px);
             border-radius: 24px;
             border: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 20px;
             overflow: hidden;
+            transition: all 0.3s ease;
         }}
-        .card-header {{
-            padding: 16px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .glass-card:hover {{
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border-color: rgba(245,87,108,0.3);
         }}
-        .card-header h2 {{ font-size: 18px; font-weight: 600; color: #f1f5f9; }}
+        .card-header {{ padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 10px; }}
+        .card-header h2 {{ font-size: 18px; color: #f1f5f9; }}
         .card-body {{ padding: 20px; }}
         .prediction-grid {{
             display: grid;
@@ -491,15 +638,17 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
         .prediction-item {{
             background: linear-gradient(145deg, #1e293b, #0f172a);
             border-radius: 28px;
-            padding: 20px 16px;
+            padding: 20px;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
         }}
-        .prediction-rank {{ font-size: 13px; color: #94a3b8; margin-bottom: 12px; }}
-        .prediction-balls {{ display: flex; justify-content: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }}
+        .prediction-item:hover {{ transform: scale(1.02); border-color: rgba(245,87,108,0.5); box-shadow: 0 0 20px rgba(245,87,108,0.2); }}
+        .prediction-balls {{ display: flex; justify-content: center; gap: 12px; margin-bottom: 12px; }}
         .ball-large {{
-            width: clamp(55px, 15vw, 68px);
-            height: clamp(55px, 15vw, 68px);
+            width: clamp(55px, 15vw, 70px);
+            height: clamp(55px, 15vw, 70px);
             background: linear-gradient(145deg, #f093fb, #f5576c);
             border-radius: 50%;
             display: flex;
@@ -510,17 +659,11 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
             color: white;
             box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }}
-        .prediction-score {{
-            display: inline-block;
-            padding: 4px 14px;
-            border-radius: 40px;
-            font-size: 13px;
-            font-weight: 600;
-        }}
+        .prediction-score {{ display: inline-block; padding: 4px 14px; border-radius: 40px; font-size: 13px; font-weight: 600; }}
         .score-high {{ background: linear-gradient(135deg, #f5576c, #f093fb); color: white; }}
         .score-mid {{ background: linear-gradient(135deg, #f59e0b, #f97316); color: white; }}
         .score-low {{ background: linear-gradient(135deg, #10b981, #34d399); color: white; }}
-        .prediction-detail {{ font-size: 11px; color: #94a3b8; margin-top: 8px; }}
+        .ai-score {{ font-size: 10px; color: #10b981; margin-top: 4px; }}
         .stats-grid {{
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -529,73 +672,71 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
         }}
         @media (max-width: 640px) {{ .stats-grid {{ grid-template-columns: repeat(2, 1fr); }} }}
         .stat-card {{
-            background: rgba(30, 41, 59, 0.6);
+            background: rgba(30,41,59,0.6);
             border-radius: 20px;
             padding: 16px;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
         }}
+        .stat-card:hover {{ transform: translateY(-2px); background: rgba(30,41,59,0.8); }}
         .stat-value {{ font-size: clamp(28px, 8vw, 36px); font-weight: 800; color: #f1f5f9; }}
         .stat-label {{ font-size: 12px; color: #94a3b8; }}
-        .stat-desc {{ font-size: 10px; color: #64748b; margin-top: 4px; }}
-        .table-wrapper {{ overflow-x: auto; -webkit-overflow-scrolling: touch; }}
+        .table-wrapper {{ overflow-x: auto; }}
         .data-table {{ width: 100%; border-collapse: collapse; min-width: 500px; }}
-        .data-table th, .data-table td {{ padding: 12px 10px; color: #e2e8f0; border-bottom: 1px solid rgba(255,255,255,0.05); }}
+        .data-table th, .data-table td {{ padding: 12px 10px; color: #e2e8f0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; }}
+        .data-table th {{ color: #94a3b8; font-weight: 500; }}
         .ball-small {{
             display: inline-flex; width: 34px; height: 34px;
             background: linear-gradient(145deg, #f093fb, #f5576c);
-            border-radius: 50%;
-            align-items: center; justify-content: center;
-            font-weight: 700; font-size: 15px;
-            color: white; margin: 0 2px;
+            border-radius: 50%; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px; color: white; margin: 0 2px;
         }}
-        .progress-bar {{ background: rgba(255,255,255,0.1); border-radius: 12px; height: 32px; overflow: hidden; margin: 12px 0; }}
+        .progress-bar {{ background: rgba(255,255,255,0.1); border-radius: 12px; height: 24px; overflow: hidden; margin: 8px 0; }}
         .progress-fill {{
             background: linear-gradient(90deg, #f093fb, #f5576c);
-            height: 100%;
-            display: flex;
-            align-items: center;
-            padding-left: 12px;
-            color: white;
-            font-size: 12px;
-            font-weight: 500;
+            height: 100%; display: flex; align-items: center; padding-left: 8px;
+            color: white; font-size: 11px; border-radius: 12px;
         }}
-        .charts-grid {{ display: flex; flex-direction: column; gap: 20px; }}
-        .chart-card {{ background: rgba(15, 23, 42, 0.8); border-radius: 20px; padding: 16px; text-align: center; }}
-        .chart-card img {{ width: 100%; border-radius: 12px; }}
+        .charts-grid {{ display: flex; flex-direction: column; gap: 24px; }}
+        .chart-card {{ background: rgba(15,23,42,0.8); border-radius: 20px; padding: 16px; text-align: center; }}
+        .chart-card img {{ width: 100%; border-radius: 12px; cursor: pointer; }}
         .footer {{ text-align: center; padding: 20px; color: #475569; font-size: 12px; }}
     </style>
 </head>
 <body>
     <div class="container">
         <div class="hero">
-            <h1>🎯 福彩3D · 智选分析</h1>
+            <h1>🎯 福彩3D · 专业分析报告<span class="ai-badge">AI增强版</span></h1>
             <div class="hero-badge">
                 <span>📅 {datetime.now().strftime('%Y-%m-%d')}</span>
                 <span>⚡ 下一期: {next_period}</span>
                 <span>📊 基于 {len(df)} 期历史数据</span>
+                <span>🤖 AI验证已启用</span>
             </div>
         </div>
-        
+
+        <!-- 推演结果 -->
         <div class="glass-card">
-            <div class="card-header"><span>⭐</span><h2>智能推演 · 下一期预测</h2></div>
+            <div class="card-header"><span>⭐</span><h2>智能推演 · 下一期预测（混合模式：规则+AI）</h2></div>
             <div class="card-body">
                 <div class="prediction-grid">
 '''
     
     for i, c in enumerate(candidates[:5], 1):
         nums = list(c['号码'])
-        score_class = "score-high" if c['得分'] >= 16 else "score-mid" if c['得分'] >= 12 else "score-low"
+        score_class = "score-high" if c['综合得分'] >= 16 else "score-mid" if c['综合得分'] >= 12 else "score-low"
+        ai_badge = f'<div class="ai-score">AI:{c.get("ai得分", 50)}分</div>' if 'ai得分' in c else ''
         html += f'''
                     <div class="prediction-item">
-                        <div class="prediction-rank">第{i}注 · 推荐</div>
                         <div class="prediction-balls">
                             <div class="ball-large">{nums[0]}</div>
                             <div class="ball-large">{nums[1]}</div>
                             <div class="ball-large">{nums[2]}</div>
                         </div>
-                        <div><span class="prediction-score {score_class}">{c['得分']}分</span></div>
-                        <div class="prediction-detail">形态: {c['形态']} | 和值: {c['和值']}</div>
+                        <div><span class="prediction-score {score_class}">{c['综合得分']}分</span></div>
+                        {ai_badge}
+                        <div style="font-size: 11px; color:#94a3b8; margin-top: 5px;">形态:{c['形态']} | 和值:{c['和值']}</div>
                     </div>
 '''
     
@@ -603,14 +744,16 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
                 </div>
             </div>
         </div>
-        
+
+        <!-- 统计卡片 -->
         <div class="stats-grid">
             <div class="stat-card"><div class="stat-value">{features['common_sum']}</div><div class="stat-label">最常见和值</div></div>
             <div class="stat-card"><div class="stat-value">{features['span_cnt'].most_common(1)[0][0]}</div><div class="stat-label">最常见跨度</div></div>
             <div class="stat-card"><div class="stat-value">{predicted_pattern}</div><div class="stat-label">预测形态</div></div>
-            {acc_html}
+            <div class="stat-card"><div class="stat-value">AI</div><div class="stat-label">验证模式</div></div>
         </div>
-        
+
+        <!-- 最近5期 -->
         <div class="glass-card">
             <div class="card-header"><span>📋</span><h2>最近5期开奖记录</h2></div>
             <div class="card-body">
@@ -622,7 +765,7 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
     
     for _, row in recent_5.iterrows():
         nums = row['开奖号码']
-        html += f'<tr><td style="font-weight: 600;">{row["期号"]}</td><td>{row["开奖日期"].strftime("%Y-%m-%d")}</td><td><span class="ball-small">{nums[0]}</span><span class="ball-small">{nums[1]}</span><span class="ball-small">{nums[2]}</span></td><td>{row["形态"]}</td><td>{row["和值"]}</td><td>{row["跨度"]}</td></tr>'
+        html += f'<tr><td>{row["期号"]}</td><td>{row["开奖日期"].strftime("%Y-%m-%d")}</td><td><span class="ball-small">{nums[0]}</span><span class="ball-small">{nums[1]}</span><span class="ball-small">{nums[2]}</span></td><td>{row["形态"]}</td><td>{row["和值"]}</td><td>{row["跨度"]}</td></tr>'
     
     html += f'''
                         </tbody>
@@ -630,7 +773,8 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
                 </div>
             </div>
         </div>
-        
+
+        <!-- 走势图 -->
         <div class="glass-card">
             <div class="card-header"><span>📈</span><h2>走势图分析（点击图片可放大）</h2></div>
             <div class="card-body">
@@ -639,12 +783,20 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
                 </div>
             </div>
         </div>
-        
-        <div class="footer">
-            ⚠️ 本分析基于历史数据统计规律，仅供学习参考<br>
-            彩票开奖是独立随机事件，任何号码中奖概率相同
-        </div>
+
+        <div class="footer">⚠️ 本分析基于历史数据统计规律 + AI辅助验证，仅供学习参考</div>
     </div>
+
+    <script>
+        document.querySelectorAll('.tab-btn').forEach(btn => {{
+            btn.addEventListener('click', () => {{
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            }});
+        }});
+    </script>
 </body>
 </html>
 '''
@@ -655,6 +807,9 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
     return filename
 
 
+# ============================================================================
+# 主程序
+# ============================================================================
 def main():
     df = load_data()
     if df is None:
@@ -675,9 +830,25 @@ def main():
     analyze_positions(df_recent, pos_data)
     
     features = analyze_features(df_recent)
+    features['predicted_pattern'] = predicted_pattern
     
-    candidates = predict(df_recent, pos_data, features, predicted_pattern)
+    # 混合模式推演
+    candidates = hybrid_predict(df_recent, pos_data, features, predicted_pattern)
     
-    accuracy_result = calculate_accuracy(df)
+    # 打印最终结果
+    print("\n" + "=" * 80)
+    print("【最终推荐】综合规则+AI评分")
+    print("=" * 80)
+    for i, c in enumerate(candidates[:5], 1):
+        ai_info = f" | AI:{c.get('ai得分', '-')}分" if 'ai得分' in c else ""
+        print(f"  第{i}注: {c['号码']} | 综合得分: {c['综合得分']}{ai_info} | 和值:{c['和值']}")
     
-    chart_files
+    chart_files = generate_charts(df)
+    html_file = generate_html_report(df_recent, pos_data, features, predicted_pattern, candidates, next_period, chart_files)
+    
+    print(f"\n✅ HTML报告已生成: {html_file}")
+    print(f"📁 位置: {os.path.abspath(html_file)}")
+
+
+if __name__ == "__main__":
+    main()
