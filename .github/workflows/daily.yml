@@ -2,7 +2,7 @@ name: 福彩3D自动分析
 
 on:
   schedule:
-    - cron: '0 10 * * *'
+    - cron: '0 10 * * *'  # UTC 10:00 = 北京时间 18:00
   workflow_dispatch:
 
 permissions:
@@ -34,14 +34,16 @@ jobs:
     - name: 运行分析程序
       run: python 福彩3D顶尖分析系统.py
     
-    - name: 列出生成的文件
-      run: ls -la
+    - name: 复制文件到 docs 目录
+      run: |
+        mkdir -p docs
+        cp fc3d_report.html docs/index.html
+        cp fc3d_*.png docs/ 2>/dev/null || true
     
-    - name: 上传报告
-      uses: actions/upload-artifact@v4
+    - name: 部署到GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
       with:
-        name: fc3d-report
-        path: |
-          fc3d_report.html
-          fc3d_*.png
-        retention-days: 7
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs
+        publish_branch: gh-pages
+        keep_files: false
