@@ -51,7 +51,7 @@
             transition: all 0.3s;
             font-size: 14px;
         }
-        .tab-btn:hover { background: rgba(245,87,108,0.2); color: #f093fb; }
+        .tab-btn:hover { background: rgba(245,87,108,0.2); color: #f093fb; transform: translateY(-2px); }
         .tab-btn.active { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
@@ -63,6 +63,12 @@
             border: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 20px;
             overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border-color: rgba(245,87,108,0.3);
         }
         .card-header {
             padding: 16px 20px;
@@ -85,7 +91,15 @@
             padding: 20px;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
+        .prediction-item:hover {
+            transform: scale(1.02);
+            border-color: rgba(245,87,108,0.5);
+            box-shadow: 0 0 20px rgba(245,87,108,0.2);
+        }
+        .prediction-item:active { transform: scale(0.98); }
         .prediction-balls { display: flex; justify-content: center; gap: 12px; margin-bottom: 12px; }
         .ball-large {
             width: clamp(55px, 15vw, 70px);
@@ -99,7 +113,9 @@
             font-weight: 800;
             color: white;
             box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
         }
+        .ball-large:hover { transform: scale(1.08); }
         .prediction-score {
             display: inline-block;
             padding: 4px 14px;
@@ -122,6 +138,13 @@
             border-radius: 20px;
             padding: 16px;
             text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            background: rgba(30,41,59,0.8);
+            border-color: rgba(245,87,108,0.3);
         }
         .stat-value { font-size: clamp(28px, 8vw, 36px); font-weight: 800; color: #f1f5f9; }
         .stat-label { font-size: 12px; color: #94a3b8; }
@@ -138,6 +161,8 @@
             text-align: center;
         }
         .data-table th { color: #94a3b8; font-weight: 500; }
+        .data-table tr { transition: all 0.2s; }
+        .data-table tr:hover { background: rgba(255,255,255,0.05); }
         .hit { background: rgba(16,185,129,0.2); color: #34d399; }
         .miss { background: rgba(239,68,68,0.2); color: #f87171; }
         .ball-small {
@@ -152,7 +177,9 @@
             font-size: 14px;
             color: white;
             margin: 0 2px;
+            transition: transform 0.2s;
         }
+        .ball-small:hover { transform: scale(1.1); }
         .cold { background: linear-gradient(145deg, #64748b, #475569); }
         .hot { background: linear-gradient(145deg, #f59e0b, #f97316); }
         .progress-bar {
@@ -171,6 +198,7 @@
             color: white;
             font-size: 11px;
             border-radius: 12px;
+            transition: width 0.5s ease;
         }
         .charts-grid { display: flex; flex-direction: column; gap: 24px; }
         .chart-card {
@@ -178,8 +206,11 @@
             border-radius: 20px;
             padding: 16px;
             text-align: center;
+            transition: all 0.3s ease;
         }
-        .chart-card img { width: 100%; border-radius: 12px; cursor: pointer; }
+        .chart-card:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .chart-card img { width: 100%; border-radius: 12px; cursor: pointer; transition: transform 0.2s; }
+        .chart-card img:hover { transform: scale(1.02); }
         .btn {
             background: linear-gradient(135deg, #f093fb, #f5576c);
             border: none;
@@ -189,14 +220,14 @@
             cursor: pointer;
             font-size: 14px;
             margin: 10px;
+            transition: all 0.3s ease;
         }
-        .btn:hover { transform: scale(1.02); }
+        .btn:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(245,87,108,0.4); }
+        .btn:active { transform: scale(0.98); }
         .footer { text-align: center; padding: 20px; color: #475569; font-size: 12px; }
         .badge-primary { background: rgba(245,87,108,0.15); color: #f093fb; padding: 4px 10px; border-radius: 100px; font-size: 11px; display: inline-block; }
         .text-white { color: white !important; }
         .miss-count { font-size: 11px; color: #94a3b8; margin-left: 5px; }
-        .hot-badge { background: #f59e0b; color: #1e293b; }
-        .cold-badge { background: #475569; color: #94a3b8; }
     </style>
 </head>
 <body>
@@ -253,7 +284,7 @@
             <button class="tab-btn" data-tab="tab5">💾 数据导出</button>
         </div>
 
-        <!-- ========== 标签页1：数据统计 ========== -->
+        <!-- 标签页1 -->
         <div id="tab1" class="tab-content active">
             <div class="stats-grid">
                 <div class="stat-card"><div class="stat-value">14</div><div class="stat-label">最常见和值</div><div class="stat-desc">出现 28次</div></div>
@@ -262,7 +293,6 @@
                 <div class="stat-card"><div class="stat-value">26.7%</div><div class="stat-label">历史命中率</div><div class="stat-desc">最近30期命中8期</div></div>
             </div>
 
-            <!-- 和值跨度组合分析 -->
             <div class="glass-card">
                 <div class="card-header"><span>🔗</span><h2>和值 · 跨度组合分析</h2></div>
                 <div class="card-body">
@@ -281,7 +311,6 @@
                 </div>
             </div>
 
-            <!-- 走势图 -->
             <div class="glass-card">
                 <div class="card-header"><span>📈</span><h2>走势图分析（点击图片可放大）</h2></div>
                 <div class="card-body">
@@ -297,12 +326,11 @@
             </div>
         </div>
 
-        <!-- ========== 标签页2：冷热号分析（真实数据） ========== -->
+        <!-- 标签页2 -->
         <div id="tab2" class="tab-content">
             <div class="glass-card">
                 <div class="card-header"><span>❄️</span><h2>冷热号分析（基于最近50期）</h2></div>
                 <div class="card-body">
-                    <!-- 百位 -->
                     <h3 style="color:#f1f5f9; margin-bottom: 15px;">📍 百位冷热号</h3>
                     <div class="stats-grid" style="grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 25px;">
                         <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">4</div><div class="stat-label">🔥 热号</div><div>出现 28次</div><div class="miss-count">遗漏 0期</div></div>
@@ -311,7 +339,6 @@
                         <div class="stat-card"><div class="stat-value" style="color:#64748b;">0</div><div class="stat-label">❄️ 冷号</div><div>出现 12次</div><div class="miss-count">遗漏 12期</div></div>
                         <div class="stat-card"><div class="stat-value" style="color:#64748b;">9</div><div class="stat-label">❄️ 冷号</div><div>出现 14次</div><div class="miss-count">遗漏 9期</div></div>
                     </div>
-                    <!-- 十位 -->
                     <h3 style="color:#f1f5f9; margin: 20px 0 15px;">📍 十位冷热号</h3>
                     <div class="stats-grid" style="grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 25px;">
                         <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">3</div><div class="stat-label">🔥 热号</div><div>出现 27次</div><div class="miss-count">遗漏 0期</div></div>
@@ -320,7 +347,6 @@
                         <div class="stat-card"><div class="stat-value" style="color:#64748b;">1</div><div class="stat-label">❄️ 冷号</div><div>出现 13次</div><div class="miss-count">遗漏 14期</div></div>
                         <div class="stat-card"><div class="stat-value" style="color:#64748b;">9</div><div class="stat-label">❄️ 冷号</div><div>出现 15次</div><div class="miss-count">遗漏 7期</div></div>
                     </div>
-                    <!-- 个位 -->
                     <h3 style="color:#f1f5f9; margin: 20px 0 15px;">📍 个位冷热号</h3>
                     <div class="stats-grid" style="grid-template-columns: repeat(5,1fr); gap: 10px;">
                         <div class="stat-card"><div class="stat-value" style="color:#f59e0b;">2</div><div class="stat-label">🔥 热号</div><div>出现 29次</div><div class="miss-count">遗漏 0期</div></div>
@@ -329,14 +355,11 @@
                         <div class="stat-card"><div class="stat-value" style="color:#64748b;">0</div><div class="stat-label">❄️ 冷号</div><div>出现 11次</div><div class="miss-count">遗漏 11期</div></div>
                         <div class="stat-card"><div class="stat-value" style="color:#64748b;">8</div><div class="stat-label">❄️ 冷号</div><div>出现 14次</div><div class="miss-count">遗漏 6期</div></div>
                     </div>
-                    <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 16px;">
-                        <p style="color:#f1f5f9; font-size: 14px;">📌 <strong>冷热号策略</strong>：热号（🔥）近期出现频繁，可重点关注；冷号（❄️）长期未出，博冷时可参考。</p>
-                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- ========== 标签页3：历史对比（真实数据） ========== -->
+        <!-- 标签页3 -->
         <div id="tab3" class="tab-content">
             <div class="glass-card">
                 <div class="card-header"><span>📈</span><h2>历史推演对比（最近10期）</h2></div>
@@ -365,7 +388,7 @@
             </div>
         </div>
 
-        <!-- ========== 标签页4：遗漏统计（真实数据） ========== -->
+        <!-- 标签页4 -->
         <div id="tab4" class="tab-content">
             <div class="glass-card">
                 <div class="card-header"><span>📉</span><h2>号码遗漏统计（当前遗漏期数）</h2></div>
@@ -390,15 +413,11 @@
                     <div class="progress-bar"><div class="progress-fill" style="width: 27%; background:#10b981;">1: 遗漏 3期</div></div>
                     <div class="progress-bar"><div class="progress-fill" style="width: 10%; background:#10b981;">5: 遗漏 1期</div></div>
                     <div class="progress-bar"><div class="progress-fill" style="width: 0%; background:#10b981;">2: 遗漏 0期 🔥</div></div>
-                    
-                    <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 16px;">
-                        <p style="color:#f1f5f9; font-size: 14px;">📌 <strong>遗漏说明</strong>：遗漏期数越大表示该号码越久没出现，冷号（❄️）可作博胆参考。</p>
-                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- ========== 标签页5：数据导出 ========== -->
+        <!-- 标签页5 -->
         <div id="tab5" class="tab-content">
             <div class="glass-card">
                 <div class="card-header"><span>💾</span><h2>数据导出</h2></div>
@@ -415,7 +434,6 @@
     </div>
 
     <script>
-        // 标签页切换
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -425,18 +443,12 @@
             });
         });
 
-        // 导出CSV功能
         document.getElementById('exportCSV')?.addEventListener('click', () => {
             const data = [['期号', '实际开奖', '推演Top5', '是否命中']];
             const rows = document.querySelectorAll('#tab3 .data-table tbody tr');
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
-                data.push([
-                    cells[0]?.innerText || '',
-                    cells[1]?.innerText || '',
-                    cells[2]?.innerText || '',
-                    cells[3]?.innerText || ''
-                ]);
+                data.push([cells[0]?.innerText || '', cells[1]?.innerText || '', cells[2]?.innerText || '', cells[3]?.innerText || '']);
             });
             const csv = data.map(row => row.join(',')).join('\n');
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
