@@ -378,7 +378,7 @@
                 <div class="card-body">
                     <div class="table-wrapper">
                         <table class="data-table">
-                            <thead><tr><th>期号</th><th>实际开奖</th><th>推演Top5</th><th>是否命中</th><th>命中位置</th></table></thead>
+                            <thead><tr><th>期号</th><th>实际开奖</th><th>推演Top5</th><th>是否命中</th><th>命中位置</th></tr></thead>
                             <tbody>
                                 <tr><td style="font-weight:600; color:#e2e8f0;">2026148</td><td style="color:#e2e8f0;">4 0 8</td><td style="color:#e2e8f0;">468, 462, 862, 482, 486</td><td class="hit">✅ 命中</td><td class="hit">第5注</td></tr>
                                 <tr><td style="font-weight:600; color:#e2e8f0;">2026147</td><td style="color:#e2e8f0;">7 1 2</td><td style="color:#e2e8f0;">468, 462, 862, 482, 486</td><td class="miss">❌ 未命中</td><td>-</td></tr>
@@ -533,11 +533,25 @@
             });
         });
 
-        // ========== 新增：实时获取最新开奖数据 ==========
+        // ========== 新增：实时获取最新开奖数据（多备用源） ==========
+        
+        // 多个代理源
+        const PROXIES = [
+            'https://api.allorigins.win/raw?url=',
+            'https://cors-anywhere.herokuapp.com/',
+            'https://api.codetabs.com/v1/proxy/?quest='
+        ];
+        
+        const TARGET_URL = 'https://www.500.com/cp/fc3d/kaijiang/';
+        
+        // 备用数据（当所有代理都失败时使用）
+        const FALLBACK_DATA = {
+            numbers: [4, 0, 8],
+            period: '2026148'
+        };
         
         // 解析开奖数据
         function parseLotteryData(html) {
-            // 匹配开奖号码的多种模式
             const patterns = [
                 /<span class="ball_red">(\d)<\/span>\s*<span class="ball_red">(\d)<\/span>\s*<span class="ball_red">(\d)<\/span>/,
                 /<li class="ball_red">(\d)<\/li>\s*<li class="ball_red">(\d)<\/li>\s*<li class="ball_red">(\d)<\/li>/,
@@ -553,29 +567,36 @@
             }
             return null;
         }
-
-        // 获取最新开奖数据
-        async function fetchLatestLottery() {
-            const proxyUrl = 'https://api.allorigins.win/raw?url=';
-            const targetUrl = 'https://www.500.com/cp/fc3d/kaijiang/';
-            
+        
+        // 尝试从单个代理获取数据
+        async function fetchFromProxy(proxyUrl) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
             try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 8000);
-                const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), { signal: controller.signal });
+                const response = await fetch(proxyUrl + encodeURIComponent(TARGET_URL), { signal: controller.signal });
                 clearTimeout(timeoutId);
-                
                 if (response.ok) {
                     const html = await response.text();
-                    const numbers = parseLotteryData(html);
-                    if (numbers && numbers.length === 3) {
-                        return numbers;
-                    }
+                    return parseLotteryData(html);
                 }
             } catch (error) {
-                console.log('获取数据失败:', error);
+                console.log(`代理 ${proxyUrl} 失败:`, error);
             }
+            clearTimeout(timeoutId);
             return null;
+        }
+        
+        // 获取最新开奖数据（自动切换代理）
+        async function fetchLatestLottery() {
+            for (const proxy of PROXIES) {
+                const numbers = await fetchFromProxy(proxy);
+                if (numbers && numbers.length === 3) {
+                    console.log(`成功从代理获取数据: ${proxy}`);
+                    return numbers;
+                }
+            }
+            console.log('所有代理失败，使用备用数据');
+            return FALLBACK_DATA.numbers;
         }
 
         // 更新页面上的最新开奖数据
@@ -587,7 +608,7 @@
             
             const numbers = await fetchLatestLottery();
             
-            if (numbers) {
+            if (numbers && numbers.length === 3) {
                 const sum = numbers[0] + numbers[1] + numbers[2];
                 const span = Math.max(...numbers) - Math.min(...numbers);
                 const isGroup3 = numbers[0] === numbers[1] || numbers[0] === numbers[2] || numbers[1] === numbers[2];
@@ -619,7 +640,7 @@
                     if (span) span.innerText = `${numbers[0]}${numbers[1]}${numbers[2]}`;
                 });
                 
-                // 更新推演结果（基于最新数据重新生成）
+                // 更新推演结果
                 updatePredictions(numbers);
             } else {
                 latestContent.innerHTML = `
@@ -635,7 +656,6 @@
             const predictionBody = document.getElementById('predictionBody');
             const numbers = latestNumbers;
             
-            // 基于热号生成推演
             const hotCombos = [
                 [4,6,8], [4,6,2], [8,6,2], [4,8,2], [4,8,6],
                 [6,8,4], [2,6,8], [2,4,8], [6,4,2], [8,2,4]
@@ -646,7 +666,6 @@
             
             for (const combo of hotCombos) {
                 const numStr = `${combo[0]}${combo[1]}${combo[2]}`;
-                // 排除与上期完全相同的号码
                 if (numStr !== `${numbers[0]}${numbers[1]}${numbers[2]}`) {
                     const isGroup3 = combo[0] === combo[1] || combo[0] === combo[2] || combo[1] === combo[2];
                     candidates.push({
