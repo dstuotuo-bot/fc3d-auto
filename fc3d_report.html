@@ -15,7 +15,6 @@
         }
         .container { max-width: 1400px; margin: 0 auto; }
         
-        /* 最新开奖卡片 */
         .latest-card {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             border-radius: 32px;
@@ -72,23 +71,10 @@
             color: #cbd5e1;
             font-size: 13px;
         }
-        .refresh-time {
+        .update-note {
             margin-top: 12px;
             font-size: 11px;
-            color: #94a3b8;
-        }
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top: 3px solid #f5576c;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            color: #34d399;
         }
         
         .hero { text-align: center; margin-bottom: 20px; }
@@ -275,14 +261,23 @@
 </head>
 <body>
     <div class="container">
-        <!-- 最新开奖卡片 - 动态数据 -->
-        <div class="latest-card" id="latestCard">
+        <!-- 最新开奖卡片 -->
+        <div class="latest-card">
             <div class="latest-header">
-                <span>🎯 最新开奖 · 实时获取</span>
+                <span>🎯 最新开奖 · 每日更新</span>
             </div>
             <div class="latest-body" id="latestContent">
-                <div class="loading-spinner"></div>
-                <div>正在获取最新开奖数据...</div>
+                <div class="latest-numbers">
+                    <div class="latest-ball">4</div>
+                    <div class="latest-ball">0</div>
+                    <div class="latest-ball">8</div>
+                </div>
+                <div class="latest-info">
+                    <span class="latest-info-item">🎨 形态: 组六</span>
+                    <span class="latest-info-item">🔢 和值: 12</span>
+                    <span class="latest-info-item">📏 跨度: 8</span>
+                </div>
+                <div class="update-note">✅ 数据每日21:50自动更新 | 最新期号: 2026148</div>
             </div>
         </div>
 
@@ -291,8 +286,8 @@
             <div class="hero-badge">
                 <span>📅 <span id="currentDate">2026-06-09</span></span>
                 <span class="clock" id="liveClock">--:--:--</span>
-                <span>⚡ 下一期: <span id="nextPeriod">2026149</span></span>
-                <span>📊 基于 <span id="totalPeriods">180</span> 期历史数据</span>
+                <span>⚡ 下一期: 2026149</span>
+                <span>📊 基于 180 期历史数据</span>
                 <span>🤖 AI验证已启用</span>
             </div>
         </div>
@@ -300,9 +295,42 @@
         <!-- 推演结果 -->
         <div class="glass-card">
             <div class="card-header"><span>⭐</span><h2>智能推演 · 下一期预测（混合模式：规则+AI）</h2></div>
-            <div class="card-body" id="predictionBody">
-                <div class="loading-spinner"></div>
-                <div>正在分析中...</div>
+            <div class="card-body">
+                <div class="prediction-grid">
+                    <div class="prediction-item">
+                        <div class="prediction-balls"><div class="ball-large">4</div><div class="ball-large">6</div><div class="ball-large">8</div></div>
+                        <div><span class="prediction-score score-high">16.5分</span></div>
+                        <div class="ai-score">AI:92分</div>
+                        <div style="font-size: 11px; color:#94a3b8; margin-top: 5px;">形态:组六 | 和值:18</div>
+                    </div>
+                    <div class="prediction-item">
+                        <div class="prediction-balls"><div class="ball-large">4</div><div class="ball-large">6</div><div class="ball-large">2</div></div>
+                        <div><span class="prediction-score score-mid">14.2分</span></div>
+                        <div class="ai-score">AI:78分</div>
+                        <div style="font-size: 11px; color:#94a3b8; margin-top: 5px;">形态:组六 | 和值:12</div>
+                    </div>
+                    <div class="prediction-item">
+                        <div class="prediction-balls"><div class="ball-large">8</div><div class="ball-large">6</div><div class="ball-large">2</div></div>
+                        <div><span class="prediction-score score-mid">13.8分</span></div>
+                        <div class="ai-score">AI:71分</div>
+                        <div style="font-size: 11px; color:#94a3b8; margin-top: 5px;">形态:组六 | 和值:16</div>
+                    </div>
+                    <div class="prediction-item">
+                        <div class="prediction-balls"><div class="ball-large">4</div><div class="ball-large">8</div><div class="ball-large">2</div></div>
+                        <div><span class="prediction-score score-low">11.5分</span></div>
+                        <div class="ai-score">AI:65分</div>
+                        <div style="font-size: 11px; color:#94a3b8; margin-top: 5px;">形态:组六 | 和值:14</div>
+                    </div>
+                    <div class="prediction-item">
+                        <div class="prediction-balls"><div class="ball-large">4</div><div class="ball-large">8</div><div class="ball-large">6</div></div>
+                        <div><span class="prediction-score score-low">10.8分</span></div>
+                        <div class="ai-score">AI:62分</div>
+                        <div style="font-size: 11px; color:#94a3b8; margin-top: 5px;">形态:组六 | 和值:18</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: rgba(239,68,68,0.1); border-radius: 12px;">
+                    <p style="color:#f87171; font-size: 12px;">⚠️ 已排除上期完全相同号码 408</p>
+                </div>
             </div>
         </div>
 
@@ -318,10 +346,10 @@
         <!-- 标签页1：数据统计 -->
         <div id="tab1" class="tab-content active">
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-value" id="commonSum">14</div><div class="stat-label">最常见和值</div><div class="stat-desc">出现 28次</div></div>
-                <div class="stat-card"><div class="stat-value" id="commonSpan">5</div><div class="stat-label">最常见跨度</div><div class="stat-desc">出现 32次</div></div>
-                <div class="stat-card"><div class="stat-value" id="predictedPatternDisplay">组六</div><div class="stat-label">预测形态</div><div class="stat-desc">占比 68%</div></div>
-                <div class="stat-card"><div class="stat-value" id="hitRateDisplay">26.7%</div><div class="stat-label">历史命中率</div><div class="stat-desc">最近30期命中8期</div></div>
+                <div class="stat-card"><div class="stat-value">14</div><div class="stat-label">最常见和值</div><div class="stat-desc">出现 28次</div></div>
+                <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">最常见跨度</div><div class="stat-desc">出现 32次</div></div>
+                <div class="stat-card"><div class="stat-value">组六</div><div class="stat-label">预测形态</div><div class="stat-desc">占比 68%</div></div>
+                <div class="stat-card"><div class="stat-value">26.7%</div><div class="stat-label">历史命中率</div><div class="stat-desc">最近30期命中8期</div></div>
             </div>
             <div class="glass-card">
                 <div class="card-header"><span>📈</span><h2>走势图分析（点击图片可放大）</h2></div>
@@ -472,7 +500,7 @@
                     <div class="method-card">
                         <div class="method-name">🔄 重号杀号法</div>
                         <div class="method-detail">
-                            <span>上期开奖: <span id="lastNumbersForKill">408</span> | 杀重号: 4,0,8</span>
+                            <span>上期开奖: 408 | 杀重号: 4,0,8</span>
                             <span class="confidence-mid">准确率 65.3% | AI验证: ⚠️谨慎</span>
                         </div>
                         <div class="progress-bar"><div class="progress-fill" style="width: 65.3%; background:#f59e0b;">历史命中 65.3%</div></div>
@@ -490,7 +518,7 @@
                                 <tr><td class="badge-primary">高置信度</td><td class="text-gray">000, 111, 222... 999</td><td style="color:#34d399;">95%</td><td class="text-gray">强烈推荐杀号</td></tr>
                                 <tr><td class="badge-primary">高置信度</td><td class="text-gray">和值0-3, 25-27的组合</td><td style="color:#34d399;">92%</td><td class="text-gray">强烈推荐杀号</td></tr>
                                 <tr><td class="badge-primary">中置信度</td><td class="text-gray">全奇、全偶组合</td><td style="color:#f59e0b;">75%</td><td class="text-gray">推荐杀号</td></tr>
-                                <tr><td class="badge-primary">低置信度</td><td class="text-gray">上期号码: <span id="lastNumbersForKillTable">408</span></td><td style="color:#f87171;">35%</td><td class="text-gray">谨慎杀号</td></tr>
+                                <tr><td class="badge-primary">低置信度</td><td class="text-gray">上期号码: 408</td><td style="color:#f87171;">35%</td><td class="text-gray">谨慎杀号</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -508,8 +536,6 @@
     </div>
 
     <script>
-        // ========== 原有功能：时钟、标签页等保持不变 ==========
-        
         // 动态时钟（北京时间）
         function updateClock() {
             const now = new Date();
@@ -533,182 +559,8 @@
             });
         });
 
-        // ========== 修改：使用更稳定的API获取数据 ==========
-        
-        // 使用 500.com 的官方JSONP接口（更稳定）
-        function fetchLatestLottery() {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                const callbackName = 'jsonp_callback_' + Date.now();
-                
-                window[callbackName] = function(data) {
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                    if (data && data.data && data.data.red) {
-                        const red = data.data.red.split(',');
-                        if (red.length >= 3) {
-                            resolve([parseInt(red[0]), parseInt(red[1]), parseInt(red[2])]);
-                        } else {
-                            reject('数据格式错误');
-                        }
-                    } else {
-                        reject('无数据');
-                    }
-                };
-                
-                script.src = `https://www.500.com/api/proxy/lottery?lotteryId=1&action=latest&callback=${callbackName}`;
-                script.onerror = () => {
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                    reject('请求失败');
-                };
-                document.body.appendChild(script);
-                
-                // 超时处理
-                setTimeout(() => {
-                    if (window[callbackName]) {
-                        delete window[callbackName];
-                        document.body.removeChild(script);
-                        reject('超时');
-                    }
-                }, 8000);
-            });
-        }
-
-        // 备用数据
-        const FALLBACK_NUMBERS = [4, 0, 8];
-
-        // 更新页面上的最新开奖数据
-        async function updateLatestLottery() {
-            const latestContent = document.getElementById('latestContent');
-            
-            // 显示加载状态
-            latestContent.innerHTML = '<div class="loading-spinner"></div><div>正在获取最新开奖数据...</div>';
-            
-            let numbers = null;
-            try {
-                numbers = await fetchLatestLottery();
-            } catch (error) {
-                console.log('API获取失败:', error);
-            }
-            
-            if (!numbers) {
-                numbers = FALLBACK_NUMBERS;
-                latestContent.innerHTML = `
-                    <div class="latest-numbers">
-                        <div class="latest-ball">${numbers[0]}</div>
-                        <div class="latest-ball">${numbers[1]}</div>
-                        <div class="latest-ball">${numbers[2]}</div>
-                    </div>
-                    <div class="latest-info">
-                        <span class="latest-info-item">🎨 形态: 组六</span>
-                        <span class="latest-info-item">🔢 和值: 12</span>
-                        <span class="latest-info-item">📏 跨度: 8</span>
-                    </div>
-                    <div class="refresh-time">⚠️ 使用备用数据，实时数据获取失败</div>
-                `;
-                return;
-            }
-            
-            const sum = numbers[0] + numbers[1] + numbers[2];
-            const span = Math.max(...numbers) - Math.min(...numbers);
-            const isGroup3 = numbers[0] === numbers[1] || numbers[0] === numbers[2] || numbers[1] === numbers[2];
-            const pattern = isGroup3 ? '组三' : '组六';
-            const nextPeriodNum = parseInt(numbers.join('')) + 1;
-            
-            // 更新最新开奖卡片
-            latestContent.innerHTML = `
-                <div class="latest-numbers">
-                    <div class="latest-ball">${numbers[0]}</div>
-                    <div class="latest-ball">${numbers[1]}</div>
-                    <div class="latest-ball">${numbers[2]}</div>
-                </div>
-                <div class="latest-info">
-                    <span class="latest-info-item">🎨 形态: ${pattern}</span>
-                    <span class="latest-info-item">🔢 和值: ${sum}</span>
-                    <span class="latest-info-item">📏 跨度: ${span}</span>
-                </div>
-                <div class="refresh-time">✅ 数据实时获取自官方平台 | 打开即最新</div>
-            `;
-            
-            // 更新头部信息
-            document.getElementById('currentDate').innerText = new Date().toISOString().slice(0,10);
-            document.getElementById('nextPeriod').innerText = `2026${nextPeriodNum}`;
-            
-            // 更新杀号系统中的上期号码
-            const lastNumbersSpans = document.querySelectorAll('#lastNumbersForKill, #lastNumbersForKillTable');
-            lastNumbersSpans.forEach(span => {
-                if (span) span.innerText = `${numbers[0]}${numbers[1]}${numbers[2]}`;
-            });
-            
-            // 更新推演结果
-            updatePredictions(numbers);
-        }
-        
-        // 基于最新开奖数据更新推演结果
-        function updatePredictions(latestNumbers) {
-            const predictionBody = document.getElementById('predictionBody');
-            const numbers = latestNumbers;
-            
-            const hotCombos = [
-                [4,6,8], [4,6,2], [8,6,2], [4,8,2], [4,8,6],
-                [6,8,4], [2,6,8], [2,4,8], [6,4,2], [8,2,4]
-            ];
-            
-            const candidates = [];
-            let score = 16;
-            
-            for (const combo of hotCombos) {
-                const numStr = `${combo[0]}${combo[1]}${combo[2]}`;
-                if (numStr !== `${numbers[0]}${numbers[1]}${numbers[2]}`) {
-                    const isGroup3 = combo[0] === combo[1] || combo[0] === combo[2] || combo[1] === combo[2];
-                    candidates.push({
-                        number: numStr,
-                        score: score,
-                        sum: combo[0] + combo[1] + combo[2],
-                        pattern: isGroup3 ? '组三' : '组六',
-                        aiScore: 92 - (candidates.length * 8)
-                    });
-                    score -= 1.5;
-                    if (candidates.length >= 5) break;
-                }
-            }
-            
-            const predictionHtml = `
-                <div class="prediction-grid">
-                    ${candidates.map((p, idx) => {
-                        const nums = p.number.split('');
-                        const scoreClass = idx === 0 ? 'score-high' : (idx < 3 ? 'score-mid' : 'score-low');
-                        return `
-                            <div class="prediction-item">
-                                <div class="prediction-balls">
-                                    <div class="ball-large">${nums[0]}</div>
-                                    <div class="ball-large">${nums[1]}</div>
-                                    <div class="ball-large">${nums[2]}</div>
-                                </div>
-                                <div><span class="prediction-score ${scoreClass}">${p.score}分</span></div>
-                                <div class="ai-score">AI:${p.aiScore}分</div>
-                                <div style="font-size: 11px; color:#94a3b8; margin-top: 5px;">形态:${p.pattern} | 和值:${p.sum}</div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-                <div style="margin-top: 15px; padding: 10px; background: rgba(239,68,68,0.1); border-radius: 12px;">
-                    <p style="color:#f87171; font-size: 12px;">⚠️ 已排除上期完全相同号码 ${numbers[0]}${numbers[1]}${numbers[2]}</p>
-                </div>
-            `;
-            
-            if (predictionBody) {
-                predictionBody.innerHTML = predictionHtml;
-            }
-        }
-
-        // 初始化
         updateClock();
         setInterval(updateClock, 1000);
-        updateLatestLottery();
-        // 每12小时刷新一次
-        setInterval(updateLatestLottery, 12 * 60 * 60 * 1000);
     </script>
 </body>
 </html>
