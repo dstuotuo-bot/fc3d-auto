@@ -80,8 +80,8 @@ def fetch_data():
             continue
     
     if not all_data:
-        # 使用手动维护的备用数据（最近一期手动填入）
-        print("使用备用数据")
+        # 使用备用数据（需要手动更新最新一期）
+        print("使用备用数据，请手动更新最新期号")
         all_data = [
             {'期号': '2026149', '开奖日期': '2026-06-08', '开奖号码': '123'},
             {'期号': '2026148', '开奖日期': '2026-06-07', '开奖号码': '408'},
@@ -99,7 +99,7 @@ def fetch_data():
     # 保存
     df = pd.DataFrame(unique)
     df.to_excel('fc3d_data.xlsx', index=False)
-    print(f"数据已保存，共 {len(df)} 期，最新: {df.iloc[0]['期号']}")
+    print(f"数据已保存，共 {len(df)} 期，最新: {df.iloc[0]['期号'] if len(df) > 0 else '无'}")
 
 if __name__ == "__main__":
     fetch_data()
