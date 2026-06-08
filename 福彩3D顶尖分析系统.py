@@ -1,14 +1,12 @@
 """
-福彩3D 顶尖专业级分析系统（混合模式：规则推演 + AI验证）
-功能：自动抓取最新数据 + 规则推演 + AI二次筛选 + 5注推荐 + 走势图
+福彩3D 顶尖专业级分析系统（中转方案版）
+功能：读取本地数据 + 规则推演 + AI验证 + 5注推荐 + 走势图
 """
 
 import pandas as pd
 import numpy as np
 from collections import Counter
 from datetime import datetime
-import requests
-from bs4 import BeautifulSoup
 import os
 import json
 import matplotlib
@@ -22,98 +20,27 @@ plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'WenQuanYi Micro Hei', 'SimHei
 plt.rcParams['axes.unicode_minus'] = False
 
 print("=" * 80)
-print("福彩3D 顶尖专业级分析系统（混合模式：规则推演 + AI验证）")
+print("福彩3D 顶尖专业级分析系统（中转方案版）")
 print(f"运行时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 print("=" * 80)
 
 
 # ============================================================================
-# 抓取最新数据 - 使用500.com API（稳定）
+# 数据加载（直接从仓库读取本地文件）
 # ============================================================================
-def fetch_data():
-    """抓取福彩3D历史数据 - 使用500.com API"""
-    all_data = []
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'application/json',
-        'Referer': 'https://www.500.com/'
-    }
-    
-    # 使用500.com的公开API
-    api_url = 'https://www.500.com/api/proxy/lottery?lotteryId=1&action=history&pageSize=200'
-    
-    try:
-        r = requests.get(api_url, headers=headers, timeout=15)
-        if r.status_code == 200:
-            data = r.json()
-            if 'data' in data and 'list' in data['data']:
-                for item in data['data']['list']:
-                    period = str(item.get('period', ''))
-                    date = item.get('date', '')
-                    red = item.get('red', '')
-                    if red and ',' in red:
-                        reds = red.split(',')
-                        if len(reds) >= 3:
-                            nums = f"{reds[0]}{reds[1]}{reds[2]}"
-                            all_data.append({'期号': period, '开奖日期': date, '开奖号码': nums})
-    except Exception as e:
-        print(f"  API抓取失败: {e}")
-    
-    if not all_data:
-        # 备用：直接解析HTML
-        try:
-            url = 'https://www.500.com/cp/fc3d/kaijiang/'
-            r = requests.get(url, headers=headers, timeout=15)
-            soup = BeautifulSoup(r.text, 'html.parser')
-            
-            rows = soup.find_all('tr')
-            for row in rows[1:21]:
-                cols = row.find_all('td')
-                if len(cols) >= 3:
-                    period = cols[0].text.strip()
-                    date = cols[1].text.strip()
-                    em = row.find_all('em')
-                    if len(em) >= 3:
-                        nums = f"{em[0].text.strip()}{em[1].text.strip()}{em[2].text.strip()}"
-                        all_data.append({'期号': period, '开奖日期': date, '开奖号码': nums})
-        except Exception as e:
-            print(f"  备用抓取失败: {e}")
-    
-    # 去重排序
-    seen = set()
-    unique = []
-    for d in all_data:
-        if d['期号'] not in seen:
-            seen.add(d['期号'])
-            unique.append(d)
-    unique.sort(key=lambda x: int(x['期号']), reverse=True)
-    
-    if unique:
-        print(f"  ✅ 成功抓取 {len(unique)} 期数据，最新期号: {unique[0]['期号']}")
-    else:
-        print("  ⚠️ 抓取失败，未获取到数据")
-    
-    return unique
-
-
 def load_data():
-    """加载数据 - 优先抓取最新数据"""
+    """加载数据 - 直接从仓库读取本地文件"""
     file_path = 'fc3d_data.xlsx'
     
     print("\n【数据获取】")
-    data = fetch_data()
     
-    if data:
-        df = pd.DataFrame(data)
-        df.to_excel(file_path, index=False)
-        print(f"  📁 数据已更新，共 {len(df)} 期")
-    else:
-        print("  ⚠️ 抓取失败，尝试读取本地备份文件")
-        if not os.path.exists(file_path):
-            print("  ❌ 无本地备份，程序退出")
-            return None
-        df = pd.read_excel(file_path, dtype={'开奖号码': str})
-        print(f"  📁 使用本地备份，共 {len(df)} 期")
+    if not os.path.exists(file_path):
+        print("  ❌ 未找到数据文件，请先手动运行一次生成初始数据")
+        return None
+    
+    df = pd.read_excel(file_path, dtype={'开奖号码': str})
+    print(f"  📁 使用本地数据文件，共 {len(df)} 期")
+    print(f"  📁 最新期号: {df.iloc[-1]['期号']}")
     
     df['开奖号码'] = df['开奖号码'].str.replace(' ', '')
     df['开奖日期'] = pd.to_datetime(df['开奖日期'])
@@ -150,6 +77,7 @@ def call_deepseek(prompt):
         return None
     
     try:
+        import requests
         response = requests.post(
             'https://api.deepseek.com/v1/chat/completions',
             headers={
