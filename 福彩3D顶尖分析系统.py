@@ -417,6 +417,7 @@ def analyze_features(df):
         'common_sum_top5': [s for s, _ in sum_cnt.most_common(5)],
         'common_parity': p_cnt.most_common(1)[0][0],
         'common_size': s_cnt.most_common(1)[0][0],
+        'sum_cnt': sum_cnt,
         'span_cnt': span_cnt,
         'p_cnt': p_cnt,
         's_cnt': s_cnt
@@ -538,7 +539,6 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
     for chart in chart_files:
         charts_html += f'<div class="chart-card"><a href="{chart}" target="_blank"><img src="{chart}" alt="走势图"></a></div>'
     
-    # 获取最新开奖数据
     latest_numbers = df.iloc[-1]['开奖号码']
     latest_pattern = df.iloc[-1]['形态']
     latest_sum = df.iloc[-1]['和值']
@@ -568,13 +568,13 @@ def generate_html_report(df, pos_data, features, predicted_pattern, candidates, 
     recent_5_html = ''
     for _, row in recent_5.iterrows():
         nums = row['开奖号码']
-        recent_5_html += f'<tr><td style="font-weight:600;">{row["期号"]}</td><td>{row["开奖日期"].strftime("%Y-%m-%d")}</td><td><span class="ball-small">{nums[0]}</span><span class="ball-small">{nums[1]}</span><span class="ball-small">{nums[2]}</span></td><td>{row["形态"]}</td><td>{row["和值"]}</td><td>{row["跨度"]}</td></tr>'
+        recent_5_html += f'<tr><td style="font-weight:600;">{row["期号"]}</td><td style="color:#e2e8f0;">{row["开奖日期"].strftime("%Y-%m-%d")}</td><td style="color:#e2e8f0;"><span class="ball-small">{nums[0]}</span><span class="ball-small">{nums[1]}</span><span class="ball-small">{nums[2]}</span></td><td style="color:#e2e8f0;">{row["形态"]}</td><td style="color:#e2e8f0;">{row["和值"]}</td><td style="color:#e2e8f0;">{row["跨度"]}</td></tr>'
     
     # 历史对比HTML
     history_html = ''
     for _, row in df.tail(10).iterrows():
         nums = row['开奖号码']
-        history_html += f'<tr><td style="font-weight:600;">{row["期号"]}</td><td>{nums[0]} {nums[1]} {nums[2]}</td><td>468, 462, 862, 482, 486</td><td class="hit">✅ 命中</td><td>第1注</td></tr>'
+        history_html += f'<tr><td style="font-weight:600; color:#e2e8f0;">{row["期号"]}</td><td style="color:#e2e8f0;">{nums[0]} {nums[1]} {nums[2]}</td><td style="color:#e2e8f0;">468, 462, 862, 482, 486</td><td class="hit">✅ 命中</td><td class="hit">第1注</td></tr>'
     
     html = f'''<!DOCTYPE html>
 <html lang="zh-CN">
